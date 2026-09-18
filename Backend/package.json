@@ -1,4 +1,9 @@
 {
+  "scripts": {
+    "start": "npm --prefix typescript-starter run start",
+    "start:dev": "npm --prefix typescript-starter run start:dev",
+    "build": "npm --prefix typescript-starter run build"
+  },
   "dependencies": {
     "@apollo/server": "^5.5.1",
     "@nestjs/apollo": "^14.0.1",
