@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import * as fs from 'fs';
 import * as path from 'path';
 import { origworld } from './origworld.js';
-import { World } from './graphql.js';
+import { Palier, Product, World } from './graphql.js';
 
 @Injectable()
 export class AppService {
@@ -62,11 +62,84 @@ export class AppService {
 		return world;
 	}
 
+	resetWorld(world: World): World {
+		const earnedAngels = Math.max(
+			0,
+			Math.floor(150 * Math.sqrt(world.score / 1_000_000)) - world.totalangels,
+		);
+		const resetWorld = structuredClone(origworld) as World;
+		resetWorld.score = world.score;
+		resetWorld.totalangels = world.totalangels + earnedAngels;
+		resetWorld.activeangels = world.activeangels + earnedAngels;
+		resetWorld.lastupdate = Math.floor(Date.now() / 1000);
+		return resetWorld;
+	}
+
+	checkUnlocks(world: World, product: Product): void {
+		for (const palier of product.paliers) {
+			if (!palier.unlocked && product.quantite >= palier.seuil) {
+				palier.unlocked = true;
+				this.applyBonus(world, palier, product);
+			}
+		}
+
+		for (const palier of world.allunlocks) {
+			const allProductsReachedThreshold = world.products.every(
+				(currentProduct) => currentProduct.quantite >= palier.seuil,
+			);
+			if (!palier.unlocked && allProductsReachedThreshold) {
+				palier.unlocked = true;
+				for (const currentProduct of world.products) {
+					this.applyBonus(world, palier, currentProduct);
+				}
+			}
+		}
+	}
+
+	applyUpgrade(world: World, palier: Palier): void {
+		if (palier.idcible === -1) {
+			this.applyBonus(world, palier);
+			return;
+		}
+
+		const products = palier.idcible === 0
+			? world.products
+			: world.products.filter((product) => product.id === palier.idcible);
+		if (products.length === 0) {
+			throw new Error(`Le produit ciblé par ${palier.name} n'existe pas`);
+		}
+		for (const product of products) {
+			this.applyBonus(world, palier, product);
+		}
+	}
+
+	private applyBonus(world: World, palier: Palier, product?: Product): void {
+		switch (palier.typeratio) {
+			case 'gain':
+				if (product) {
+					product.revenu *= palier.ratio;
+				}
+				break;
+			case 'vitesse':
+				if (product) {
+					product.vitesse = Math.max(1, Math.floor(product.vitesse / palier.ratio));
+				}
+				break;
+			case 'ange':
+				world.angelbonus *= palier.ratio;
+				break;
+		}
+	}
+
 	private addProduction(world: World, product: World['products'][number], count: number): void {
 		if (count <= 0) {
 			return;
 		}
-		const gains = count * product.revenu * (1 + world.angelbonus / 100);
+		const gains =
+			count *
+			product.quantite *
+			product.revenu *
+			(1 + (world.activeangels * world.angelbonus) / 100);
 		world.money += gains;
 		world.score += gains;
 	}

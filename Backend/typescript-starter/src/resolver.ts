@@ -39,6 +39,7 @@ export class GraphQlResolver {
 		world.money -= totalCost;
 		product.quantite += quantite;
 		product.cout *= product.croissance ** quantite;
+		this.service.checkUnlocks(world, product);
 		this.service.saveWorld(user, world);
 		return product;
 	}
@@ -72,5 +73,55 @@ export class GraphQlResolver {
 		manager.unlocked = true;
 		this.service.saveWorld(user, world);
 		return manager;
+	}
+
+	@Mutation()
+	acheterCashUpgrade(@Args('user') user: string, @Args('name') name: string): Palier {
+		const world = this.service.updateWorld(this.service.readUserWorld(user));
+		const upgrade = world.upgrades.find((item) => item.name === name);
+		if (!upgrade) {
+			throw new Error(`L'upgrade ${name} n'existe pas`);
+		}
+		if (upgrade.unlocked) {
+			throw new Error(`L'upgrade ${name} est déjà débloqué`);
+		}
+		if (world.money < upgrade.seuil) {
+			throw new Error("L'argent du monde est insuffisant");
+		}
+
+		world.money -= upgrade.seuil;
+		upgrade.unlocked = true;
+		this.service.applyUpgrade(world, upgrade);
+		this.service.saveWorld(user, world);
+		return upgrade;
+	}
+
+	@Mutation()
+	acheterAngelUpgrade(@Args('user') user: string, @Args('name') name: string): Palier {
+		const world = this.service.updateWorld(this.service.readUserWorld(user));
+		const upgrade = world.angelupgrades.find((item) => item.name === name);
+		if (!upgrade) {
+			throw new Error(`L'angel upgrade ${name} n'existe pas`);
+		}
+		if (upgrade.unlocked) {
+			throw new Error(`L'angel upgrade ${name} est déjà débloqué`);
+		}
+		if (world.activeangels < upgrade.seuil) {
+			throw new Error('Le nombre d anges actifs est insuffisant');
+		}
+
+		world.activeangels -= upgrade.seuil;
+		upgrade.unlocked = true;
+		this.service.applyUpgrade(world, upgrade);
+		this.service.saveWorld(user, world);
+		return upgrade;
+	}
+
+	@Mutation()
+	resetWorld(@Args('user') user: string): World {
+		const world = this.service.updateWorld(this.service.readUserWorld(user));
+		const resetWorld = this.service.resetWorld(world);
+		this.service.saveWorld(user, resetWorld);
+		return resetWorld;
 	}
 }
