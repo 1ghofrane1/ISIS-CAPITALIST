@@ -5,6 +5,7 @@ import { createObserveModule } from '@nestjs/observe';
 import { join } from 'node:path';
 import { AppController } from './app.controller.js';
 import { AppService } from './app.service.js';
+import { GraphQlResolver } from './resolver.js';
 
 export const { ObserveModule, ObserveInstrument } = createObserveModule();
 
@@ -28,6 +29,6 @@ export const { ObserveModule, ObserveInstrument } = createObserveModule();
     }),
   ],
   controllers: [AppController],
-  providers: [AppService],
+  providers: [AppService, GraphQlResolver],
 })
 export class AppModule {}

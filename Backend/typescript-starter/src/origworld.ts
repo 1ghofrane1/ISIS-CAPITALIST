@@ -2,7 +2,7 @@ import { RatioType } from './graphql.js';
 
 export const origworld = {
 	name: 'Saveurs de Tunisie',
-	logo: 'icones/tunisie.jpg',
+	logo: 'icones/Chechia.png',
 	money: 0,
 	score: 0,
 	totalangels: 0,
@@ -13,7 +13,7 @@ export const origworld = {
 		{
 			id: 1,
 			name: 'Chechia',
-			logo: 'icones/chechia.jpg',
+			logo: 'icones/Chechia.png',
 			cout: 4,
 			croissance: 1.07,
 			revenu: 1,
@@ -24,7 +24,7 @@ export const origworld = {
 			paliers: [
 				{
 					name: 'Chechia traditionnelle',
-					logo: 'icones/chechia.jpg',
+					logo: 'icones/Chechia.png',
 					seuil: 20,
 					idcible: 1,
 					ratio: 2,
@@ -33,7 +33,7 @@ export const origworld = {
 				},
 				{
 					name: 'Chechia de ceremonie',
-					logo: 'icones/chechia.jpg',
+					logo: 'icones/Chechia.png',
 					seuil: 75,
 					idcible: 1,
 					ratio: 2,
@@ -42,7 +42,7 @@ export const origworld = {
 				},
 				{
 					name: 'Chechia royale',
-					logo: 'icones/chechia.jpg',
+					logo: 'icones/Chechia.png',
 					seuil: 250,
 					idcible: 1,
 					ratio: 3,
@@ -54,7 +54,7 @@ export const origworld = {
 		{
 			id: 2,
 			name: 'Chicha',
-			logo: 'icones/chicha.jpg',
+			logo: 'icones/Chicha.png',
 			cout: 60,
 			croissance: 1.15,
 			revenu: 60,
@@ -65,7 +65,7 @@ export const origworld = {
 			paliers: [
 				{
 					name: 'Chicha en terre cuite',
-					logo: 'icones/chicha.jpg',
+					logo: 'icones/Chicha.png',
 					seuil: 20,
 					idcible: 2,
 					ratio: 2,
@@ -74,7 +74,7 @@ export const origworld = {
 				},
 				{
 					name: 'Chicha parfume',
-					logo: 'icones/chicha.jpg',
+					logo: 'icones/Chicha.png',
 					seuil: 75,
 					idcible: 2,
 					ratio: 2,
@@ -83,7 +83,7 @@ export const origworld = {
 				},
 				{
 					name: 'Chicha des medinas',
-					logo: 'icones/chicha.jpg',
+					logo: 'icones/Chicha.png',
 					seuil: 250,
 					idcible: 2,
 					ratio: 3,
@@ -95,7 +95,7 @@ export const origworld = {
 		{
 			id: 3,
 			name: 'Harissa',
-			logo: 'icones/harissa.jpg',
+			logo: 'icones/Harissa.png',
 			cout: 720,
 			croissance: 1.22,
 			revenu: 540,
@@ -106,7 +106,7 @@ export const origworld = {
 			paliers: [
 				{
 					name: 'Harissa douce',
-					logo: 'icones/harissa.jpg',
+					logo: 'icones/Harissa.png',
 					seuil: 20,
 					idcible: 3,
 					ratio: 2,
@@ -115,7 +115,7 @@ export const origworld = {
 				},
 				{
 					name: 'Harissa bien relevee',
-					logo: 'icones/harissa.jpg',
+					logo: 'icones/Harissa.png',
 					seuil: 75,
 					idcible: 3,
 					ratio: 2,
@@ -124,7 +124,7 @@ export const origworld = {
 				},
 				{
 					name: 'Harissa artisanale',
-					logo: 'icones/harissa.jpg',
+					logo: 'icones/Harissa.png',
 					seuil: 250,
 					idcible: 3,
 					ratio: 3,
@@ -136,7 +136,7 @@ export const origworld = {
 		{
 			id: 4,
 			name: 'Fricassee',
-			logo: 'icones/fricassee.jpg',
+			logo: 'icones/Fricassée.png',
 			cout: 8640,
 			croissance: 1.29,
 			revenu: 4320,
@@ -147,7 +147,7 @@ export const origworld = {
 			paliers: [
 				{
 					name: 'Fricassee croustillante',
-					logo: 'icones/fricassee.jpg',
+					logo: 'icones/Fricassée.png',
 					seuil: 20,
 					idcible: 4,
 					ratio: 2,
@@ -156,7 +156,7 @@ export const origworld = {
 				},
 				{
 					name: 'Fricassee epicee',
-					logo: 'icones/fricassee.jpg',
+					logo: 'icones/Fricassée.png',
 					seuil: 75,
 					idcible: 4,
 					ratio: 2,
@@ -165,7 +165,7 @@ export const origworld = {
 				},
 				{
 					name: 'Fricassee de la Marsa',
-					logo: 'icones/fricassee.jpg',
+					logo: 'icones/Fricassée.png',
 					seuil: 250,
 					idcible: 4,
 					ratio: 3,
@@ -177,7 +177,7 @@ export const origworld = {
 		{
 			id: 5,
 			name: 'Boga',
-			logo: 'icones/boga.jpg',
+			logo: 'icones/Boga.png',
 			cout: 103680,
 			croissance: 1.36,
 			revenu: 34560,
@@ -188,7 +188,7 @@ export const origworld = {
 			paliers: [
 				{
 					name: 'Boga glacee',
-					logo: 'icones/boga.jpg',
+					logo: 'icones/Boga.png',
 					seuil: 20,
 					idcible: 5,
 					ratio: 2,
@@ -197,7 +197,7 @@ export const origworld = {
 				},
 				{
 					name: 'Boga pour tous',
-					logo: 'icones/boga.jpg',
+					logo: 'icones/Boga.png',
 					seuil: 75,
 					idcible: 5,
 					ratio: 2,
@@ -206,7 +206,7 @@ export const origworld = {
 				},
 				{
 					name: 'Boga premium',
-					logo: 'icones/boga.jpg',
+					logo: 'icones/Boga.png',
 					seuil: 250,
 					idcible: 5,
 					ratio: 3,
@@ -218,7 +218,7 @@ export const origworld = {
 		{
 			id: 6,
 			name: 'Djeba',
-			logo: 'icones/djeba.jpg',
+			logo: 'icones/Djeba.png',
 			cout: 1244160,
 			croissance: 1.43,
 			revenu: 311040,
@@ -229,7 +229,7 @@ export const origworld = {
 			paliers: [
 				{
 					name: 'Djeba brodee',
-					logo: 'icones/djeba.jpg',
+					logo: 'icones/Djeba.png',
 					seuil: 20,
 					idcible: 6,
 					ratio: 2,
@@ -238,7 +238,7 @@ export const origworld = {
 				},
 				{
 					name: 'Djeba de fete',
-					logo: 'icones/djeba.jpg',
+					logo: 'icones/Djeba.png',
 					seuil: 75,
 					idcible: 6,
 					ratio: 2,
@@ -247,7 +247,7 @@ export const origworld = {
 				},
 				{
 					name: 'Djeba de prestige',
-					logo: 'icones/djeba.jpg',
+					logo: 'icones/Djeba.png',
 					seuil: 250,
 					idcible: 6,
 					ratio: 3,
@@ -260,7 +260,7 @@ export const origworld = {
 	allunlocks: [
 		{
 			name: 'Le gout du partage',
-			logo: 'icones/all.jpg',
+			logo: 'icones/Allunlock.png',
 			seuil: 30,
 			idcible: 0,
 			ratio: 2,
@@ -269,7 +269,7 @@ export const origworld = {
 		},
 		{
 			name: 'Traditions tunisiennes',
-			logo: 'icones/all.jpg',
+			logo: 'icones/Allunlock.png',
 			seuil: 150,
 			idcible: 0,
 			ratio: 3,
@@ -278,7 +278,7 @@ export const origworld = {
 		},
 		{
 			name: 'Fierte nationale',
-			logo: 'icones/all.jpg',
+			logo: 'icones/Allunlock.png',
 			seuil: 500,
 			idcible: 0,
 			ratio: 4,
@@ -289,7 +289,7 @@ export const origworld = {
 	upgrades: [
 		{
 			name: 'Fil de qualite',
-			logo: 'icones/chechia.jpg',
+			logo: 'icones/Chechia.png',
 			seuil: 1000,
 			idcible: 1,
 			ratio: 3,
@@ -298,7 +298,7 @@ export const origworld = {
 		},
 		{
 			name: 'Tabac parfume',
-			logo: 'icones/chicha.jpg',
+			logo: 'icones/Chicha.png',
 			seuil: 3000,
 			idcible: 2,
 			ratio: 3,
@@ -307,7 +307,7 @@ export const origworld = {
 		},
 		{
 			name: 'Piments rouges',
-			logo: 'icones/harissa.jpg',
+			logo: 'icones/Harissa.png',
 			seuil: 10000,
 			idcible: 3,
 			ratio: 3,
@@ -316,7 +316,7 @@ export const origworld = {
 		},
 		{
 			name: 'Pain tabouna',
-			logo: 'icones/fricassee.jpg',
+			logo: 'icones/Fricassée.png',
 			seuil: 25000,
 			idcible: 4,
 			ratio: 3,
@@ -325,7 +325,7 @@ export const origworld = {
 		},
 		{
 			name: 'Bulles tunisiennes',
-			logo: 'icones/boga.jpg',
+			logo: 'icones/Boga.png',
 			seuil: 50000,
 			idcible: 5,
 			ratio: 3,
@@ -334,7 +334,7 @@ export const origworld = {
 		},
 		{
 			name: 'Broderie fine',
-			logo: 'icones/djeba.jpg',
+			logo: 'icones/Djeba.png',
 			seuil: 100000,
 			idcible: 6,
 			ratio: 3,
@@ -343,7 +343,7 @@ export const origworld = {
 		},
 		{
 			name: 'Atelier moderne',
-			logo: 'icones/all.jpg',
+			logo: 'icones/Chechia.png',
 			seuil: 250000,
 			idcible: 0,
 			ratio: 2,
@@ -352,7 +352,7 @@ export const origworld = {
 		},
 		{
 			name: 'Savoir-faire familial',
-			logo: 'icones/all.jpg',
+			logo: 'icones/Chechia.png',
 			seuil: 500000,
 			idcible: 0,
 			ratio: 3,
@@ -361,7 +361,7 @@ export const origworld = {
 		},
 		{
 			name: 'Saveurs authentiques',
-			logo: 'icones/all.jpg',
+			logo: 'icones/Chechia.png',
 			seuil: 1000000,
 			idcible: 0,
 			ratio: 4,
@@ -370,7 +370,7 @@ export const origworld = {
 		},
 		{
 			name: 'Rayonnement international',
-			logo: 'icones/all.jpg',
+			logo: 'icones/Chechia.png',
 			seuil: 5000000,
 			idcible: 0,
 			ratio: 5,
@@ -381,7 +381,7 @@ export const origworld = {
 	angelupgrades: [
 		{
 			name: 'Ange des medinas',
-			logo: 'icones/angel.png',
+			logo: 'icones/Angel.png',
 			seuil: 10,
 			idcible: 0,
 			ratio: 3,
@@ -390,7 +390,7 @@ export const origworld = {
 		},
 		{
 			name: 'Ange des saveurs',
-			logo: 'icones/angel.png',
+			logo: 'icones/Angel.png',
 			seuil: 100,
 			idcible: 0,
 			ratio: 2,
@@ -399,7 +399,7 @@ export const origworld = {
 		},
 		{
 			name: 'Ange du commerce',
-			logo: 'icones/angel.png',
+			logo: 'icones/Angel.png',
 			seuil: 1000,
 			idcible: 0,
 			ratio: 5,
@@ -408,7 +408,7 @@ export const origworld = {
 		},
 		{
 			name: 'Mutinerie des anges',
-			logo: 'icones/angel.png',
+			logo: 'icones/Angel.png',
 			seuil: 10000,
 			idcible: -1,
 			ratio: 2,
@@ -419,7 +419,7 @@ export const origworld = {
 	managers: [
 		{
 			name: 'Hassen',
-			logo: 'icones/manager-chechia.jpg',
+			logo: 'icones/Hassen.png',
 			seuil: 10,
 			idcible: 1,
 			ratio: 0,
@@ -428,7 +428,7 @@ export const origworld = {
 		},
 		{
 			name: 'Noura',
-			logo: 'icones/manager-chicha.jpg',
+			logo: 'icones/Noura.png',
 			seuil: 15000,
 			idcible: 2,
 			ratio: 0,
@@ -437,7 +437,7 @@ export const origworld = {
 		},
 		{
 			name: 'Amel',
-			logo: 'icones/manager-harissa.jpg',
+			logo: 'icones/Amel.png',
 			seuil: 50000,
 			idcible: 3,
 			ratio: 0,
@@ -446,7 +446,7 @@ export const origworld = {
 		},
 		{
 			name: 'Yassine',
-			logo: 'icones/manager-fricassee.jpg',
+			logo: 'icones/Yassine.png',
 			seuil: 100000,
 			idcible: 4,
 			ratio: 0,
@@ -455,7 +455,7 @@ export const origworld = {
 		},
 		{
 			name: 'Sami',
-			logo: 'icones/manager-boga.jpg',
+			logo: 'icones/Sami.png',
 			seuil: 250000,
 			idcible: 5,
 			ratio: 0,
@@ -464,7 +464,7 @@ export const origworld = {
 		},
 		{
 			name: 'Ines',
-			logo: 'icones/manager-djeba.jpg',
+			logo: 'icones/Ines.png',
 			seuil: 500000,
 			idcible: 6,
 			ratio: 0,
