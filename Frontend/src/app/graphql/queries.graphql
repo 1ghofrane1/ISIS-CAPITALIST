@@ -1,0 +1,105 @@
+query GetWorld($user: String!) {
+  getWorld(user: $user) {
+    name
+    logo
+    money
+    score
+    totalangels
+    activeangels
+    angelbonus
+    lastupdate
+    products {
+      id
+      name
+      logo
+      cout
+      croissance
+      revenu
+      vitesse
+      quantite
+      timeleft
+      managerUnlocked
+      paliers {
+        name
+        logo
+        seuil
+        idcible
+        ratio
+        typeratio
+        unlocked
+      }
+    }
+    allunlocks {
+      name
+      logo
+      seuil
+      idcible
+      ratio
+      typeratio
+      unlocked
+    }
+    upgrades {
+      name
+      logo
+      seuil
+      idcible
+      ratio
+      typeratio
+      unlocked
+    }
+    angelupgrades {
+      name
+      logo
+      seuil
+      idcible
+      ratio
+      typeratio
+      unlocked
+    }
+    managers {
+      name
+      logo
+      seuil
+      idcible
+      ratio
+      typeratio
+      unlocked
+    }
+  }
+}
+
+mutation AcheterQtProduit($user: String!, $id: Int!, $quantite: Int!) {
+  acheterQtProduit(user: $user, id: $id, quantite: $quantite) {
+    id
+  }
+}
+
+mutation LancerProductionProduit($user: String!, $id: Int!) {
+  lancerProductionProduit(user: $user, id: $id) {
+    id
+  }
+}
+
+mutation EngagerManager($user: String!, $name: String!) {
+  engagerManager(user: $user, name: $name) {
+    name
+  }
+}
+
+mutation AcheterCashUpgrade($user: String!, $name: String!) {
+  acheterCashUpgrade(user: $user, name: $name) {
+    name
+  }
+}
+
+mutation AcheterAngelUpgrade($user: String!, $name: String!) {
+  acheterAngelUpgrade(user: $user, name: $name) {
+    name
+  }
+}
+
+mutation ResetWorld($user: String!) {
+  resetWorld(user: $user) {
+    name
+  }
+}
