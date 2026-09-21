@@ -15,11 +15,27 @@ export class AppService {
 			const data = fs.readFileSync(
 				path.join(process.cwd(), 'userworlds', `${user}-world.json`),
 			);
-			return JSON.parse(data.toString()) as World;
+			const savedWorld = JSON.parse(data.toString()) as World;
+			if (savedWorld.money === 0 && savedWorld.score === 0 && savedWorld.totalangels === 0) {
+				return structuredClone(origworld) as World;
+			}
+			this.migrateProductionSpeeds(savedWorld);
+			return savedWorld;
 		} catch (error: unknown) {
 			console.log((error as Error).message);
 			return structuredClone(origworld) as World;
 		}
+	}
+
+	private migrateProductionSpeeds(world: World): void {
+		const previousSpeeds = [500, 3000, 7000, 15000, 30000, 60000];
+		const currentSpeeds = [1, 2, 4, 10, 30, 60];
+		world.products.forEach((product, index) => {
+			if (product.vitesse === previousSpeeds[index]) {
+				product.vitesse = currentSpeeds[index];
+				product.timeleft = Math.min(product.timeleft, product.vitesse);
+			}
+		});
 	}
 
 	saveWorld(user: string, world: World): void {
