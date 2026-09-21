@@ -1,0 +1,60 @@
+<article class="product-card" [class.is-running]="isRunning()">
+  <button
+    class="product-visual"
+    type="button"
+    (click)="startProduction()"
+    [disabled]="prod().managerUnlocked || prod().quantite === 0 || prod().timeleft > 0"
+    [attr.aria-label]="'Lancer la production de ' + prod().name"
+  >
+    <span class="image-ring">
+      <img [src]="game.assetUrl(prod().logo)" [alt]="prod().name" />
+    </span>
+    <span class="quantity">{{ prod().quantite | bigvalue }}</span>
+    @if (prod().managerUnlocked) {
+      <span class="managed-pill"><span class="live-dot"></span> Auto</span>
+    } @else if (prod().timeleft <= 0 && prod().quantite > 0) {
+      <span class="launch-hint">Produire</span>
+    }
+  </button>
+
+  <div class="product-content">
+    <div class="product-heading">
+      <div>
+        <p class="eyebrow">Atelier tunisien</p>
+        <h2>{{ prod().name }}</h2>
+      </div>
+      <div class="yield">
+        <span>Revenu</span>
+        <strong>{{ productionGain() | bigvalue }} DT</strong>
+      </div>
+    </div>
+
+    <div class="progress-shell" [class.idle]="!isRunning()">
+      <div class="progress-fill" [style.width.%]="progress()"></div>
+      <div class="progress-copy">
+        <span>{{ isRunning() ? 'Production en cours' : 'Prêt à produire' }}</span>
+        <strong>{{ progress() | number: '1.0-0' }}%</strong>
+      </div>
+    </div>
+
+    <div class="product-footer">
+      <button
+        class="buy-button"
+        type="button"
+        (click)="buy()"
+        [disabled]="!canBuy() || game.isPending('product:' + prod().id)"
+      >
+        <span class="buy-quantity">Acheter {{ numberToBuy() | bigvalue }}</span>
+        <span class="buy-cost">{{ purchaseCost() | bigvalue }} DT</span>
+      </button>
+
+      <div class="timer" [class.active]="isRunning()">
+        <span class="timer-icon" aria-hidden="true">◷</span>
+        <span>
+          <small>Cycle</small>
+          <strong>{{ prod().timeleft | duration }}</strong>
+        </span>
+      </div>
+    </div>
+  </div>
+</article>
