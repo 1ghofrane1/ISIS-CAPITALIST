@@ -1,0 +1,176 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <title>ISIS Capitalist - Guide du code backend</title>
+  <style>
+    @page { size: A4; margin: 18mm 16mm 18mm; }
+    :root { --ink: #17212b; --muted: #52616b; --accent: #0b7285; --line: #d9e2e8; --soft: #eef7f8; }
+    * { box-sizing: border-box; }
+    body { color: var(--ink); font-family: "Segoe UI", Arial, sans-serif; line-height: 1.48; font-size: 10.5pt; }
+    h1 { color: #073b4c; font-size: 28pt; line-height: 1.08; margin: 0 0 8px; }
+    h2 { color: #0b5968; font-size: 18pt; margin: 24px 0 8px; padding-bottom: 4px; border-bottom: 2px solid var(--line); break-after: avoid; }
+    h3 { color: #174a59; font-size: 13pt; margin: 16px 0 5px; break-after: avoid; }
+    p { margin: 7px 0; }
+    ul, ol { margin-top: 5px; }
+    li { margin: 3px 0; }
+    code { font-family: Consolas, "Courier New", monospace; background: #f2f5f6; padding: 1px 4px; border-radius: 3px; }
+    pre { background: #17212b; color: #edf6f9; padding: 11px 13px; border-radius: 5px; overflow-wrap: anywhere; white-space: pre-wrap; font: 9pt/1.4 Consolas, "Courier New", monospace; break-inside: avoid; }
+    .cover { min-height: 235mm; display: flex; flex-direction: column; justify-content: center; border-left: 9px solid var(--accent); padding-left: 22px; }
+    .subtitle { font-size: 15pt; color: var(--muted); margin: 0 0 24px; }
+    .meta { color: var(--muted); border-top: 1px solid var(--line); padding-top: 10px; }
+    .box { background: var(--soft); border-left: 4px solid var(--accent); padding: 9px 12px; margin: 10px 0; break-inside: avoid; }
+    .flow { font-family: Consolas, monospace; background: #f7fafb; border: 1px solid var(--line); padding: 12px; white-space: pre-wrap; break-inside: avoid; }
+    .file { color: var(--accent); font-family: Consolas, monospace; font-weight: 700; }
+    table { width: 100%; border-collapse: collapse; margin: 8px 0 12px; break-inside: avoid; }
+    th, td { border: 1px solid var(--line); padding: 6px 7px; text-align: left; vertical-align: top; }
+    th { background: var(--soft); color: #174a59; }
+    .page-break { break-before: page; }
+    .small { color: var(--muted); font-size: 9pt; }
+  </style>
+</head>
+<body>
+  <section class="cover">
+    <h1>ISIS Capitalist</h1>
+    <p class="subtitle">Comprendre le code du backend NestJS</p>
+    <p>Guide pédagogique basé sur le code présent dans <code>Backend/typescript-starter/src</code> et sur le PDF de consignes du projet.</p>
+    <p class="meta">Architecture GraphQL schema-first, logique métier, sauvegarde des mondes et progression temporelle.</p>
+  </section>
+
+  <h2>1. Architecture générale</h2>
+  <p>Le backend est une application NestJS. Le frontend envoie des requêtes GraphQL ; le resolver les reçoit et délègue les règles du jeu au service.</p>
+  <div class="flow">Frontend Angular
+    |
+    | requête GraphQL
+    v
+schema.graphql  = contrat de l'API
+    |
+    v
+resolver.ts     = traduction des actions du joueur
+    |
+    v
+app.service.ts  = règles du jeu et calculs
+    |
+    +--> origworld.ts                 monde initial
+    +--> userworlds/{user}-world.json sauvegarde du joueur</div>
+  <p><strong>Idée essentielle :</strong> <code>schema.graphql</code> décrit ce qui est possible, <code>resolver.ts</code> répond aux demandes, et <code>app.service.ts</code> décide réellement du résultat.</p>
+
+  <h2>2. Démarrage et assemblage</h2>
+  <h3><span class="file">main.ts</span></h3>
+  <p>C'est le point d'entrée de l'application. <code>NestFactory.create(AppModule)</code> démarre NestJS avec le module principal.</p>
+  <ul>
+    <li><code>useStaticAssets(.../public)</code> rend les images de <code>public</code> accessibles par HTTP ;</li>
+    <li><code>enableCors()</code> autorise le frontend à appeler le backend depuis un autre port ;</li>
+    <li><code>listen(... ?? 3000)</code> démarre le serveur sur le port configuré ou sur 3000.</li>
+  </ul>
+
+  <h3><span class="file">app.module.ts</span></h3>
+  <p>Ce fichier assemble l'application avec le décorateur <code>@Module</code>.</p>
+  <pre>GraphQLModule.forRoot({
+  driver: ApolloDriver,
+  typePaths: ['./**/*.graphql'],
+  definitions: {
+    path: join(process.cwd(), 'src/graphql.ts'),
+    outputAs: 'class'
+  }
+})</pre>
+  <p>Cette configuration active Apollo GraphQL, cherche le schéma dans les fichiers <code>.graphql</code> et génère les classes TypeScript dans <code>graphql.ts</code>. Le module <code>ObserveModule</code> vient du starter NestJS et ajoute de la supervision.</p>
+  <p><code>controllers</code> contient les routes HTTP classiques. <code>providers</code> contient les classes injectables : <code>AppService</code> et <code>GraphQlResolver</code>.</p>
+
+  <h2>3. Le contrat GraphQL</h2>
+  <h3><span class="file">schema.graphql</span></h3>
+  <p>Le projet suit l'approche <strong>schema-first</strong> du PDF : le schéma est écrit en premier, puis les types TypeScript sont générés.</p>
+  <table>
+    <tr><th>Type</th><th>Rôle</th></tr>
+    <tr><td><code>RatioType</code></td><td>Définit un bonus de revenu, de vitesse ou d'anges.</td></tr>
+    <tr><td><code>Palier</code></td><td>Décrit un unlock, une amélioration ou un manager.</td></tr>
+    <tr><td><code>Product</code></td><td>Décrit un produit achetable et productible.</td></tr>
+    <tr><td><code>World</code></td><td>Contient tout l'état d'une partie.</td></tr>
+  </table>
+  <p>La query <code>getWorld(user)</code> lit le monde d'un joueur. Les six mutations correspondent aux actions prévues dans le PDF : achat, production, manager, upgrades et reset.</p>
+
+  <h3><span class="file">graphql.ts</span></h3>
+  <p>Ce fichier est généré automatiquement depuis le schéma. Il fournit notamment les classes <code>Palier</code>, <code>Product</code> et <code>World</code>, ainsi que les interfaces abstraites de query et de mutation.</p>
+  <div class="box"><strong>À retenir :</strong> ne pas modifier manuellement <code>graphql.ts</code>. Une régénération GraphQL pourrait écraser les changements.</div>
+
+  <h2>4. Le monde initial</h2>
+  <h3><span class="file">origworld.ts</span></h3>
+  <p>Ce fichier exporte <code>origworld</code>, la partie utilisée pour un nouveau joueur. Il respecte l'objectif du PDF : six produits, trois paliers par produit, trois allunlocks, dix upgrades, quatre angel upgrades et six managers.</p>
+  <p>Les six produits sont Chechia, Chicha, Harissa, Fricassee, Boga et Djeba. Chaque produit possède un prix, un coefficient de croissance, un revenu, une vitesse, une quantité et des paliers.</p>
+  <pre>nouveau prix = ancien prix × croissance
+
+gain = productions × quantité × revenu
+       × (1 + anges actifs × bonus ange / 100)</pre>
+  <p><code>idcible</code> indique le produit concerné. La valeur <code>0</code> signifie tous les produits et <code>-1</code> signifie un effet directement appliqué au monde, comme le bonus des anges.</p>
+
+  <h2>5. Le service métier</h2>
+  <h3><span class="file">app.service.ts</span></h3>
+  <p><code>@Injectable()</code> permet à NestJS de créer le service et de l'injecter dans le resolver.</p>
+
+  <h3>Lire et sauvegarder un monde</h3>
+  <p><code>readUserWorld(user)</code> cherche <code>userworlds/{user}-world.json</code>. Si le fichier n'existe pas, le service renvoie une copie de <code>origworld</code>. La copie est nécessaire pour éviter de modifier le modèle initial partagé en mémoire.</p>
+  <p><code>saveWorld(user, world)</code> crée le dossier si besoin, puis écrit le monde en JSON. Le code actuel utilise une écriture synchrone, alors que le PDF présentait une version asynchrone.</p>
+
+  <h3>Calculer le temps écoulé</h3>
+  <p><code>updateWorld(world)</code> compare l'heure actuelle avec <code>lastupdate</code>. Pour un produit sans manager, elle termine ou réduit la production manuelle en cours. Pour un produit avec manager, elle calcule le nombre de cycles automatiques terminés et conserve le reste dans <code>timeleft</code>.</p>
+  <pre>elapsed = maintenant - lastupdate
+cycles = floor((elapsed + timeleft) / vitesse)
+timeleft = (elapsed + timeleft) modulo vitesse</pre>
+  <p>Chaque production appelle ensuite <code>addProduction</code>, qui ajoute le gain à l'argent et au score.</p>
+
+  <h3>Débloquer et appliquer les bonus</h3>
+  <p><code>checkUnlocks</code> vérifie les paliers du produit et les paliers globaux. Un palier individuel dépend de la quantité d'un produit ; un <code>allunlock</code> exige que tous les produits atteignent le seuil.</p>
+  <p><code>applyUpgrade</code> choisit la cible avec <code>idcible</code>, puis <code>applyBonus</code> applique le type de bonus :</p>
+  <ul>
+    <li><code>gain</code> multiplie <code>revenu</code> ;</li>
+    <li><code>vitesse</code> divise la durée de production ;</li>
+    <li><code>ange</code> augmente <code>angelbonus</code>.</li>
+  </ul>
+
+  <h3>Réinitialiser une partie</h3>
+  <p><code>resetWorld</code> calcule les anges gagnés à partir du score, recrée un monde depuis <code>origworld</code>, conserve le score et ajoute les nouveaux anges à <code>totalangels</code> et <code>activeangels</code>.</p>
+
+  <h2>6. Les opérations GraphQL</h2>
+  <h3><span class="file">resolver.ts</span></h3>
+  <p>Le resolver reçoit les arguments GraphQL avec <code>@Args</code>. Avant chaque action, il recharge le monde et appelle <code>updateWorld</code> afin de calculer les gains accumulés depuis la dernière action.</p>
+
+  <h3><code>getWorld</code></h3>
+  <ol><li>Lire le fichier du joueur.</li><li>Calculer les productions dues.</li><li>Sauvegarder le monde actualisé.</li><li>Le retourner au frontend.</li></ol>
+
+  <h3><code>acheterQtProduit</code></h3>
+  <p>La mutation vérifie l'identifiant et la quantité, calcule le prix de chaque exemplaire, déduit l'argent, augmente la quantité, augmente le prix futur et vérifie les unlocks.</p>
+
+  <h3><code>lancerProductionProduit</code></h3>
+  <p>Elle place <code>timeleft</code> à la valeur de <code>vitesse</code>. La production sera traitée lors d'une prochaine requête.</p>
+
+  <h3><code>engagerManager</code></h3>
+  <p>Elle cherche le manager, trouve son produit grâce à <code>idcible</code>, puis active <code>managerUnlocked</code>. Le produit devient automatique.</p>
+
+  <h3><code>acheterCashUpgrade</code> et <code>acheterAngelUpgrade</code></h3>
+  <p>La première consomme de l'argent ; la seconde consomme des anges actifs. Dans les deux cas, l'amélioration est marquée comme débloquée et son bonus est appliqué.</p>
+
+  <h3><code>resetWorld</code></h3>
+  <p>Elle met à jour le monde une dernière fois, le réinitialise avec le service et sauvegarde le résultat.</p>
+
+  <h2>7. Routes et tests</h2>
+  <h3><span class="file">app.controller.ts</span></h3>
+  <p>Ce contrôleur provient du squelette NestJS. <code>GET /</code> renvoie <code>Hello World!</code>. Il sert de test de démarrage, mais ne contient pas la logique du jeu.</p>
+  <h3><span class="file">app.controller.spec.ts</span> et <span class="file">test/app.e2e-spec.ts</span></h3>
+  <p>Le premier test vérifie directement la méthode du contrôleur. Le test end-to-end démarre toute l'application et envoie une vraie requête HTTP à <code>/</code>. Ces tests ne couvrent pas encore les mutations GraphQL.</p>
+
+  <h2>8. Correspondance avec le PDF</h2>
+  <table>
+    <tr><th>PDF</th><th>Implémentation actuelle</th></tr>
+    <tr><td>Schéma GraphQL schema-first</td><td><code>schema.graphql</code> + génération de <code>graphql.ts</code></td></tr>
+    <tr><td>Monde initial</td><td><code>origworld.ts</code> avec six produits et leurs contenus</td></tr>
+    <tr><td>Mondes par utilisateur</td><td><code>userworlds/{user}-world.json</code></td></tr>
+    <tr><td>Resolver GraphQL</td><td><code>resolver.ts</code></td></tr>
+    <tr><td>Règles communes</td><td><code>app.service.ts</code></td></tr>
+    <tr><td>Images statiques</td><td><code>main.ts</code> expose <code>public</code></td></tr>
+    <tr><td>Évolution temporelle</td><td><code>updateWorld</code> et <code>addProduction</code></td></tr>
+    <tr><td>Unlocks, upgrades, anges et reset</td><td><code>checkUnlocks</code>, <code>applyUpgrade</code>, <code>resetWorld</code></td></tr>
+  </table>
+  <div class="box"><strong>Résumé :</strong> le resolver orchestre les actions, le service applique les règles, le fichier d'origine initialise les parties, et les fichiers JSON conservent leur état entre deux requêtes.</div>
+  <p class="small">Document généré à partir de l'état actuel du dépôt ISIS-CAPITALIST.</p>
+</body>
+</html>
