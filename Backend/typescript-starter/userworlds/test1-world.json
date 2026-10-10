@@ -1,23 +1,23 @@
 {
   "name": "Saveurs de Tunisie",
   "logo": "icones/Chechia.png",
-  "money": 419.17454396000005,
-  "score": 724.7800000000002,
-  "totalangels": 1,
-  "activeangels": 1,
+  "money": 41996220.467945725,
+  "score": 667257322.2399998,
+  "totalangels": 99,
+  "activeangels": 69,
   "angelbonus": 2,
-  "lastupdate": 1791646803,
+  "lastupdate": 1791650375,
   "products": [
     {
       "id": 1,
       "name": "Chechia",
       "logo": "icones/Chechia.png",
-      "cout": 5.6102069228000015,
+      "cout": 3031.5881756185413,
       "croissance": 1.07,
-      "revenu": 1,
-      "vitesse": 1000,
-      "quantite": 6,
-      "timeleft": 877,
+      "revenu": 1080,
+      "vitesse": 250,
+      "quantite": 99,
+      "timeleft": 69,
       "managerUnlocked": true,
       "paliers": [
         {
@@ -27,7 +27,7 @@
           "idcible": 1,
           "ratio": 2,
           "typeratio": "vitesse",
-          "unlocked": false
+          "unlocked": true
         },
         {
           "name": "Chechia de ceremonie",
@@ -36,7 +36,7 @@
           "idcible": 1,
           "ratio": 2,
           "typeratio": "gain",
-          "unlocked": false
+          "unlocked": true
         },
         {
           "name": "Chechia royale",
@@ -53,13 +53,13 @@
       "id": 2,
       "name": "Chicha",
       "logo": "icones/Chicha.png",
-      "cout": 104.94037499999997,
+      "cout": 1298.6847421302718,
       "croissance": 1.15,
-      "revenu": 60,
-      "vitesse": 2000,
-      "quantite": 4,
-      "timeleft": 1400,
-      "managerUnlocked": false,
+      "revenu": 32400,
+      "vitesse": 500,
+      "quantite": 22,
+      "timeleft": 387,
+      "managerUnlocked": true,
       "paliers": [
         {
           "name": "Chicha en terre cuite",
@@ -68,7 +68,7 @@
           "idcible": 2,
           "ratio": 2,
           "typeratio": "vitesse",
-          "unlocked": false
+          "unlocked": true
         },
         {
           "name": "Chicha parfume",
@@ -94,13 +94,13 @@
       "id": 3,
       "name": "Harissa",
       "logo": "icones/Harissa.png",
-      "cout": 720,
+      "cout": 11651.185744314607,
       "croissance": 1.22,
-      "revenu": 540,
-      "vitesse": 4000,
-      "quantite": 0,
-      "timeleft": 0,
-      "managerUnlocked": false,
+      "revenu": 291600,
+      "vitesse": 2000,
+      "quantite": 14,
+      "timeleft": 1789,
+      "managerUnlocked": true,
       "paliers": [
         {
           "name": "Harissa douce",
@@ -135,13 +135,13 @@
       "id": 4,
       "name": "Fricassee",
       "logo": "icones/Fricassée.png",
-      "cout": 8640,
+      "cout": 23926.136918400003,
       "croissance": 1.29,
-      "revenu": 4320,
-      "vitesse": 10000,
-      "quantite": 0,
-      "timeleft": 0,
-      "managerUnlocked": false,
+      "revenu": 2332800,
+      "vitesse": 5000,
+      "quantite": 4,
+      "timeleft": 2243,
+      "managerUnlocked": true,
       "paliers": [
         {
           "name": "Fricassee croustillante",
@@ -176,13 +176,13 @@
       "id": 5,
       "name": "Boga",
       "logo": "icones/Boga.png",
-      "cout": 103680,
+      "cout": 482380.26345676824,
       "croissance": 1.36,
-      "revenu": 34560,
-      "vitesse": 30000,
-      "quantite": 0,
-      "timeleft": 0,
-      "managerUnlocked": false,
+      "revenu": 18662400,
+      "vitesse": 15000,
+      "quantite": 5,
+      "timeleft": 11635,
+      "managerUnlocked": true,
       "paliers": [
         {
           "name": "Boga glacee",
@@ -217,13 +217,13 @@
       "id": 6,
       "name": "Djeba",
       "logo": "icones/Djeba.png",
-      "cout": 1244160,
+      "cout": 266021535.88737455,
       "croissance": 1.43,
-      "revenu": 311040,
-      "vitesse": 60000,
-      "quantite": 0,
-      "timeleft": 0,
-      "managerUnlocked": false,
+      "revenu": 167961600,
+      "vitesse": 30000,
+      "quantite": 15,
+      "timeleft": 6769,
+      "managerUnlocked": true,
       "paliers": [
         {
           "name": "Djeba brodee",
@@ -292,7 +292,7 @@
       "idcible": 1,
       "ratio": 3,
       "typeratio": "gain",
-      "unlocked": false
+      "unlocked": true
     },
     {
       "name": "Tabac parfume",
@@ -301,7 +301,7 @@
       "idcible": 2,
       "ratio": 3,
       "typeratio": "gain",
-      "unlocked": false
+      "unlocked": true
     },
     {
       "name": "Piments rouges",
@@ -310,7 +310,7 @@
       "idcible": 3,
       "ratio": 3,
       "typeratio": "gain",
-      "unlocked": false
+      "unlocked": true
     },
     {
       "name": "Pain tabouna",
@@ -319,7 +319,7 @@
       "idcible": 4,
       "ratio": 3,
       "typeratio": "gain",
-      "unlocked": false
+      "unlocked": true
     },
     {
       "name": "Bulles tunisiennes",
@@ -328,7 +328,7 @@
       "idcible": 5,
       "ratio": 3,
       "typeratio": "gain",
-      "unlocked": false
+      "unlocked": true
     },
     {
       "name": "Broderie fine",
@@ -337,7 +337,7 @@
       "idcible": 6,
       "ratio": 3,
       "typeratio": "gain",
-      "unlocked": false
+      "unlocked": true
     },
     {
       "name": "Atelier moderne",
@@ -346,7 +346,7 @@
       "idcible": 0,
       "ratio": 2,
       "typeratio": "vitesse",
-      "unlocked": false
+      "unlocked": true
     },
     {
       "name": "Savoir-faire familial",
@@ -355,7 +355,7 @@
       "idcible": 0,
       "ratio": 3,
       "typeratio": "gain",
-      "unlocked": false
+      "unlocked": true
     },
     {
       "name": "Saveurs authentiques",
@@ -364,7 +364,7 @@
       "idcible": 0,
       "ratio": 4,
       "typeratio": "gain",
-      "unlocked": false
+      "unlocked": true
     },
     {
       "name": "Rayonnement international",
@@ -373,7 +373,7 @@
       "idcible": 0,
       "ratio": 5,
       "typeratio": "gain",
-      "unlocked": false
+      "unlocked": true
     }
   ],
   "angelupgrades": [
@@ -384,7 +384,7 @@
       "idcible": 0,
       "ratio": 3,
       "typeratio": "gain",
-      "unlocked": false
+      "unlocked": true
     },
     {
       "name": "Ange des saveurs",
@@ -431,7 +431,7 @@
       "idcible": 2,
       "ratio": 0,
       "typeratio": "gain",
-      "unlocked": false
+      "unlocked": true
     },
     {
       "name": "Amel",
@@ -440,7 +440,7 @@
       "idcible": 3,
       "ratio": 0,
       "typeratio": "gain",
-      "unlocked": false
+      "unlocked": true
     },
     {
       "name": "Yassine",
@@ -449,7 +449,7 @@
       "idcible": 4,
       "ratio": 0,
       "typeratio": "gain",
-      "unlocked": false
+      "unlocked": true
     },
     {
       "name": "Sami",
@@ -458,7 +458,7 @@
       "idcible": 5,
       "ratio": 0,
       "typeratio": "gain",
-      "unlocked": false
+      "unlocked": true
     },
     {
       "name": "Ines",
@@ -467,9 +467,9 @@
       "idcible": 6,
       "ratio": 0,
       "typeratio": "gain",
-      "unlocked": false
+      "unlocked": true
     }
   ],
   "saveVersion": 2,
-  "lastupdateMs": 1791646803678
+  "lastupdateMs": 1791650375461
 }

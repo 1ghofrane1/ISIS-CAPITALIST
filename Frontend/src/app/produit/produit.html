@@ -1,62 +1,64 @@
-<article class="product-card" [class.is-running]="isRunning()">
-  <button
-    class="product-visual"
-    type="button"
-    (click)="startProduction()"
-    [disabled]="
-      game.busy() || prod().managerUnlocked || prod().quantite === 0 || prod().timeleft > 0
-    "
-    [attr.aria-label]="'Lancer la production de ' + prod().name"
-  >
-    <span class="image-ring">
+<article class="product-card">
+  <div class="product-picture">
+    <button
+      type="button"
+      (click)="startProduction()"
+      [disabled]="
+        game.busy() || prod().managerUnlocked || prod().quantite === 0 || prod().timeleft > 0
+      "
+      [attr.aria-label]="'Lancer la production de ' + prod().name"
+    >
       <img [src]="game.assetUrl(prod().logo)" [alt]="prod().name" />
-    </span>
-    <span class="quantity">{{ prod().quantite | bigvalue }}</span>
-    @if (prod().managerUnlocked) {
-      <span class="managed-pill"><span class="live-dot"></span> Auto</span>
-    } @else if (prod().timeleft <= 0 && prod().quantite > 0) {
-      <span class="launch-hint">Produire</span>
-    }
-  </button>
+    </button>
+    <span class="quantity"
+      >Quantité : <strong>{{ prod().quantite | bigvalue }}</strong></span
+    >
+  </div>
 
   <div class="product-content">
     <div class="product-heading">
-      <div>
-        <p class="eyebrow">Atelier tunisien</p>
-        <h2>{{ prod().name }}</h2>
-      </div>
-      <div class="yield">
-        <span>Revenu</span>
-        <strong>{{ productionGain() | bigvalue }} DT</strong>
-      </div>
-    </div>
-
-    <div class="progress-shell" [class.idle]="!isRunning()">
-      <div class="progress-fill" [style.width.%]="progress()"></div>
-      <div class="progress-copy">
-        <span>{{ isRunning() ? 'Production en cours' : 'Prêt à produire' }}</span>
-        <strong>{{ progress() | number: '1.0-0' }}%</strong>
-      </div>
-    </div>
-
-    <div class="product-footer">
-      <button
-        class="buy-button"
-        type="button"
-        (click)="buy()"
-        [disabled]="game.busy() || !canBuy()"
+      <h2>{{ prod().name }}</h2>
+      <span class="gain"
+        ><strong>{{ productionGain() | bigvalue }}</strong> DT / cycle</span
       >
-        <span class="buy-quantity">Acheter {{ numberToBuy() | bigvalue }}</span>
-        <span class="buy-cost">{{ purchaseCost() | bigvalue }} DT</span>
-      </button>
-
-      <div class="timer" [class.active]="isRunning()">
-        <span class="timer-icon" aria-hidden="true">◷</span>
-        <span>
-          <small>Cycle</small>
-          <strong>{{ prod().timeleft | duration }}</strong>
-        </span>
-      </div>
     </div>
+
+    <div class="product-details">
+      <span class="duration"
+        >Durée : <strong>{{ prod().vitesse | duration }}</strong></span
+      >
+      @if (prod().quantite === 0) {
+        <span class="mode mode-locked">À acheter</span>
+      } @else if (prod().managerUnlocked) {
+        <span class="mode mode-auto">Automatique</span>
+      } @else {
+        <span class="mode mode-manual">Manuel</span>
+      }
+    </div>
+
+    <div
+      class="progress-bar"
+      role="progressbar"
+      aria-valuemin="0"
+      aria-valuemax="100"
+      [attr.aria-label]="'Progression de ' + prod().name"
+      [attr.aria-valuenow]="progress() | number: '1.0-0'"
+    >
+      <div class="progress-fill" [style.width.%]="progress()"></div>
+    </div>
+
+    <div class="production-status">
+      @if (prod().quantite === 0) {
+        Achetez un exemplaire pour commencer.
+      } @else if (isRunning()) {
+        Production en cours · reste {{ prod().timeleft | duration }}
+      } @else {
+        Prêt à produire · cliquez sur l'image.
+      }
+    </div>
+
+    <button class="buy-button" type="button" (click)="buy()" [disabled]="game.busy() || !canBuy()">
+      Acheter {{ numberToBuy() | bigvalue }} — {{ purchaseCost() | bigvalue }} DT
+    </button>
   </div>
 </article>

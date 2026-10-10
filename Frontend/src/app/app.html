@@ -2,38 +2,22 @@
   <header class="topbar">
     <a class="brand" href="#main-content" aria-label="Aller au jeu">
       @if (game.world(); as world) {
-        <span class="brand-mark">
-          <img [src]="game.assetUrl(world.logo)" [alt]="world.name" />
-        </span>
-        <span class="brand-copy">
-          <small>ISIS Capitalist</small>
-          <strong>{{ world.name }}</strong>
-        </span>
+        <img [src]="game.assetUrl(world.logo)" [alt]="world.name" />
+        <span
+          ><small>ISIS Capitalist</small><strong>{{ world.name }}</strong></span
+        >
       } @else {
-        <span class="brand-mark brand-placeholder">ت</span>
-        <span class="brand-copy">
-          <small>ISIS Capitalist</small>
-          <strong>Saveurs de Tunisie</strong>
-        </span>
+        <span><small>ISIS Capitalist</small><strong>Saveurs de Tunisie</strong></span>
       }
     </a>
 
-    <div class="header-money" aria-live="polite">
-      <span class="money-icon" aria-hidden="true">د.ت</span>
-      <span>
-        <small>Trésorerie</small>
-        <strong>{{ game.world()?.money ?? 0 | bigvalue }} DT</strong>
-      </span>
+    <div class="header-money">
+      <span>Argent disponible</span>
+      <strong>{{ game.world()?.money ?? 0 | bigvalue }} DT</strong>
     </div>
 
-    <button class="purchase-mode" type="button" (click)="game.cyclePurchaseMode()">
-      <span>Quantité d'achat</span>
-      <strong>{{ game.purchaseModeLabel() }}</strong>
-      <span class="cycle-icon" aria-hidden="true">↻</span>
-    </button>
-
     <div class="player-control">
-      <label for="player-name">Identifiant joueur</label>
+      <label for="player-name">Joueur</label>
       <div class="player-input-row">
         <input
           id="player-name"
@@ -42,141 +26,77 @@
           [formField]="game.loginForm.username"
           (keydown.enter)="game.commitName()"
         />
-        <button
-          type="button"
-          (click)="game.commitName()"
-          [disabled]="game.busy()"
-          aria-label="Charger la partie de ce joueur"
-        >
-          {{ game.loading() ? '…' : '↗' }}
+        <button type="button" (click)="game.commitName()" [disabled]="game.busy()">
+          {{ game.loading() ? 'Chargement…' : 'Charger' }}
         </button>
       </div>
     </div>
   </header>
 
-  @if (game.loading()) {
-    <div class="sync-line" aria-label="Synchronisation en cours">
-      <span></span>
-    </div>
-  }
   @if (game.world(); as world) {
     <div class="game-layout">
       <aside class="side-nav" aria-label="Menu du jeu">
-        <div class="side-nav-intro">
-          <span class="nav-kicker">Le souk</span>
-          <strong>Votre empire</strong>
-        </div>
-
+        <h2>Menu</h2>
         <nav>
-          <button type="button" (click)="openModal('unlocks')">
-            <span class="nav-icon unlock-icon" aria-hidden="true">✦</span>
-            <span class="nav-copy">
-              <strong>Unlocks</strong>
-              <small>Prochains paliers</small>
-            </span>
-          </button>
-
+          <button type="button" class="menu-unlocks" (click)="openModal('unlocks')">Paliers</button>
           <button
             type="button"
+            class="menu-cash"
+            (click)="openModal('cash')"
             [matBadge]="game.cashUpgradeBadge()"
             [matBadgeHidden]="game.cashUpgradeBadge() === 0"
-            matBadgeColor="warn"
-            (click)="openModal('cash')"
           >
-            <span class="nav-icon cash-icon" aria-hidden="true">◆</span>
-            <span class="nav-copy">
-              <strong>Cash Upgrades</strong>
-              <small>Booster les profits</small>
-            </span>
+            Améliorations
           </button>
-
           <button
             type="button"
-            [matBadge]="game.angelUpgradeBadge()"
-            [matBadgeHidden]="game.angelUpgradeBadge() === 0"
-            matBadgeColor="warn"
-            (click)="openModal('angels')"
-          >
-            <span class="nav-icon angel-icon" aria-hidden="true">♢</span>
-            <span class="nav-copy">
-              <strong>Angel Upgrades</strong>
-              <small>Dépenser des anges</small>
-            </span>
-          </button>
-
-          <button
-            type="button"
+            class="menu-managers"
+            (click)="openModal('managers')"
             [matBadge]="game.managerBadge()"
             [matBadgeHidden]="game.managerBadge() === 0"
-            matBadgeColor="warn"
-            (click)="openModal('managers')"
           >
-            <span class="nav-icon manager-icon" aria-hidden="true">♟</span>
-            <span class="nav-copy">
-              <strong>Managers</strong>
-              <small>Automatiser</small>
-            </span>
+            Managers
           </button>
-
-          <button type="button" (click)="openModal('investors')">
-            <span class="nav-icon investor-icon" aria-hidden="true">☀</span>
-            <span class="nav-copy">
-              <strong>Investors</strong>
-              <small>{{ world.activeangels | bigvalue }} anges actifs</small>
-            </span>
+          <button type="button" class="menu-investors" (click)="openModal('investors')">
+            Anges et reset
+          </button>
+          <button
+            type="button"
+            class="menu-angels"
+            (click)="openModal('angels')"
+            [matBadge]="game.angelUpgradeBadge()"
+            [matBadgeHidden]="game.angelUpgradeBadge() === 0"
+          >
+            Bonus d'anges
           </button>
         </nav>
-
-        <div class="side-quote">
-          <span aria-hidden="true">“</span>
-          <p>Du premier atelier au royaume des saveurs.</p>
-        </div>
+        <p class="menu-help">Le nombre rouge indique les achats disponibles.</p>
       </aside>
 
       <main id="main-content" class="content">
-        <section class="hero-panel">
-          <div class="hero-copy">
-            <p class="section-kicker">Tableau de bord</p>
-            <h1>Nos ateliers tunisiens</h1>
-            <p>
-              Produisez, achetez des produits et engagez des managers pour automatiser les ateliers.
-            </p>
+        <dl class="game-summary">
+          <div class="summary-card score-stat">
+            <dt>Score cumulé</dt>
+            <dd>{{ world.score | bigvalue }} <span class="stat-unit">DT</span></dd>
           </div>
-
-          <div class="hero-stats">
-            <article>
-              <span class="stat-icon red" aria-hidden="true">↗</span>
-              <div>
-                <small>Score cumulé</small>
-                <strong>{{ world.score | bigvalue }}</strong>
-              </div>
-            </article>
-            <article>
-              <span class="stat-icon green" aria-hidden="true">✦</span>
-              <div>
-                <small>Anges actifs</small>
-                <strong>{{ world.activeangels | bigvalue }}</strong>
-              </div>
-            </article>
-            <article>
-              <span class="stat-icon gold" aria-hidden="true">×</span>
-              <div>
-                <small>Bonus angélique</small>
-                <strong>+{{ world.activeangels * world.angelbonus | bigvalue }}%</strong>
-              </div>
-            </article>
+          <div class="summary-card angel-stat">
+            <dt>Anges actifs</dt>
+            <dd>{{ world.activeangels | bigvalue }}</dd>
           </div>
-        </section>
+          <div class="summary-card bonus-stat">
+            <dt>Bonus des anges</dt>
+            <dd>+{{ world.activeangels * world.angelbonus | bigvalue }}%</dd>
+          </div>
+        </dl>
 
-        <section class="products-section" aria-labelledby="products-title">
+        <section aria-labelledby="products-title">
           <div class="section-heading">
-            <div>
-              <p class="section-kicker">Les ateliers</p>
-              <h2 id="products-title">Productions du monde</h2>
-            </div>
-            <p>Cliquez sur une icône pour lancer une production manuelle.</p>
+            <h1 id="products-title">Productions</h1>
+            <button class="purchase-mode" type="button" (click)="game.cyclePurchaseMode()">
+              Quantité d'achat : <strong>{{ game.purchaseModeLabel() }}</strong>
+            </button>
           </div>
-
+          <p class="instructions">Cliquez sur l'image d'un produit pour lancer sa production.</p>
           <div class="products-grid">
             @for (product of world.products; track product.id) {
               <app-produit [prod]="product" [qtmulti]="game.purchaseMode()" />
@@ -185,29 +105,28 @@
         </section>
 
         <footer>
-          <span>Saveurs de Tunisie</span>
           <span
             >Partie de <strong>{{ game.user() }}</strong></span
           >
-          <button type="button" (click)="game.refreshWorld()">Synchroniser ↻</button>
+          <button type="button" (click)="game.refreshWorld()" [disabled]="game.busy()">
+            {{ game.loading() ? 'Synchronisation…' : 'Synchroniser' }}
+          </button>
         </footer>
+        @if (game.connectionError()) {
+          <p class="connection-error" role="alert">{{ game.connectionError() }}</p>
+        }
       </main>
     </div>
   } @else {
     <main class="connection-state">
-      <div class="connection-illustration" aria-hidden="true">ت</div>
       @if (game.connectionError()) {
-        <p class="section-kicker">Backend indisponible</p>
-        <h1>Le souk est momentanément fermé.</h1>
-        <p>
-          Vérifiez que le serveur NestJS fonctionne sur
-          <code>{{ game.server() }}</code
-          >, puis relancez la synchronisation.
-        </p>
-        <button type="button" (click)="game.refreshWorld()">Réessayer la connexion</button>
+        <h1>Impossible de charger la partie</h1>
+        <p>Vérifiez que le serveur du jeu est démarré, puis réessayez.</p>
+        <button type="button" (click)="game.refreshWorld()" [disabled]="game.busy()">
+          Réessayer
+        </button>
       } @else {
-        <p class="section-kicker">Chargement</p>
-        <h1>Ouverture des ateliers…</h1>
+        <h1>Chargement de la partie…</h1>
       }
     </main>
   }
@@ -223,17 +142,15 @@
       (click)="$event.stopPropagation()"
     >
       <button class="modal-close" type="button" (click)="closeModal()" aria-label="Fermer">
-        ×
+        Fermer ×
       </button>
 
       @switch (modal) {
         @case ('managers') {
           <div class="modal-header">
-            <span class="modal-symbol manager-icon">♟</span>
             <div>
-              <p class="section-kicker">Automatisation</p>
-              <h2 id="managers-title">Les maîtres des ateliers</h2>
-              <p>Engagez un manager pour produire sans interruption, même hors connexion.</p>
+              <h2 id="managers-title">Managers</h2>
+              <p>Un manager lance automatiquement les productions de son produit.</p>
             </div>
           </div>
           <div class="modal-list">
@@ -264,10 +181,8 @@
         }
         @case ('unlocks') {
           <div class="modal-header">
-            <span class="modal-symbol unlock-icon">✦</span>
             <div>
-              <p class="section-kicker">Objectifs</p>
-              <h2 id="unlocks-title">Les prochains paliers</h2>
+              <h2 id="unlocks-title">Paliers à atteindre</h2>
               <p>Ces bonus se débloquent automatiquement en développant vos ateliers.</p>
             </div>
           </div>
@@ -286,17 +201,15 @@
                 </div>
               </article>
             } @empty {
-              <div class="empty-state">Tous les paliers sont débloqués. Magnifique !</div>
+              <div class="empty-state">Tous les paliers sont débloqués.</div>
             }
           </div>
         }
         @case ('cash') {
           <div class="modal-header">
-            <span class="modal-symbol cash-icon">◆</span>
             <div>
-              <p class="section-kicker">Investissements</p>
-              <h2 id="cash-title">Cash Upgrades</h2>
-              <p>Réinvestissez vos dinars pour accélérer durablement votre croissance.</p>
+              <h2 id="cash-title">Améliorations en dinars</h2>
+              <p>Achetez un bonus de revenu ou de vitesse pour vos produits.</p>
             </div>
           </div>
           <div class="modal-list">
@@ -321,17 +234,15 @@
                 </button>
               </article>
             } @empty {
-              <div class="empty-state">Tous les Cash Upgrades sont actifs.</div>
+              <div class="empty-state">Toutes les améliorations en dinars sont actives.</div>
             }
           </div>
         }
         @case ('investors') {
           <div class="modal-header">
-            <span class="modal-symbol investor-icon">☀</span>
             <div>
-              <p class="section-kicker">Prestige</p>
-              <h2 id="investors-title">Angel Investors</h2>
-              <p>Repartez de zéro pour convertir votre progression en puissance permanente.</p>
+              <h2 id="investors-title">Récupérer des anges</h2>
+              <p>Les anges augmentent les revenus de toutes vos productions.</p>
             </div>
           </div>
           <div class="investor-summary">
@@ -340,7 +251,6 @@
               <strong>{{ game.world()?.activeangels ?? 0 | bigvalue }}</strong>
               <span>+{{ game.world()?.angelbonus ?? 0 }}% par ange</span>
             </article>
-            <span class="summary-arrow" aria-hidden="true">→</span>
             <article class="claim-card">
               <small>À récupérer maintenant</small>
               <strong>{{ game.claimableAngels() | bigvalue }}</strong>
@@ -348,10 +258,9 @@
             </article>
           </div>
           <div class="reset-warning">
-            <span aria-hidden="true">!</span>
             <p>
               Le reset conserve votre score et vos anges, mais remet l'argent, les produits,
-              managers et upgrades à leur état initial.
+              managers et améliorations à leur état initial.
             </p>
           </div>
           <button
@@ -362,19 +271,19 @@
           >
             {{
               game.busy() || game.isPending('reset')
-                ? 'Nouveau départ…'
-                : 'Réclamer
-      et recommencer'
+                ? 'Réinitialisation…'
+                : 'Récupérer les anges et recommencer'
             }}
           </button>
         }
         @case ('angels') {
           <div class="modal-header">
-            <span class="modal-symbol angel-icon">♢</span>
             <div>
-              <p class="section-kicker">Pouvoir céleste</p>
-              <h2 id="angels-title">Angel Upgrades</h2>
-              <p>Dépensez vos anges actifs avec sagesse : ils sont précieux.</p>
+              <h2 id="angels-title">Améliorations avec des anges</h2>
+              <p>
+                Ces améliorations coûtent des anges actifs : leur achat réduit votre bonus de
+                revenu.
+              </p>
             </div>
           </div>
           <div class="angel-balance">
@@ -403,7 +312,7 @@
                 </button>
               </article>
             } @empty {
-              <div class="empty-state">Tous les Angel Upgrades sont actifs.</div>
+              <div class="empty-state">Toutes les améliorations avec des anges sont actives.</div>
             }
           </div>
         }
