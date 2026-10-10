@@ -50,9 +50,9 @@ export class Produit implements OnInit, OnDestroy {
     this.lastTick = performance.now();
     this.timerId = setInterval(() => {
       const now = performance.now();
-      const elapsedSeconds = (now - this.lastTick) / 1000;
+      const elapsedMilliseconds = now - this.lastTick;
       this.lastTick = now;
-      this.game.tickProduct(this.prod().id, elapsedSeconds);
+      this.game.tickProduct(this.prod().id, elapsedMilliseconds);
     }, 100);
   }
 

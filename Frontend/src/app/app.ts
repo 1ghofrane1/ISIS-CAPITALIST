@@ -8,6 +8,7 @@ import {
   signal,
 } from '@angular/core';
 import { MatBadge } from '@angular/material/badge';
+import { FormField } from '@angular/forms/signals';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import type { ModalName } from './models/game.models';
 import { BigValuePipe } from './pipes/big-value.pipe';
@@ -16,7 +17,7 @@ import { GameService } from './services/game.service';
 
 @Component({
   selector: 'app-root',
-  imports: [Produit, BigValuePipe, MatBadge, MatSnackBarModule],
+  imports: [Produit, BigValuePipe, MatBadge, MatSnackBarModule, FormField],
   templateUrl: './app.html',
   styleUrl: './app.css',
   changeDetection: ChangeDetectionStrategy.OnPush,

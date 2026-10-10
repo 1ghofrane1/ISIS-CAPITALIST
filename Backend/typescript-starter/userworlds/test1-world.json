@@ -1,23 +1,23 @@
 {
   "name": "Saveurs de Tunisie",
   "logo": "icones/Chechia.png",
-  "money": 557123455.2667626,
-  "score": 557141386,
-  "totalangels": 0,
-  "activeangels": 0,
+  "money": 419.17454396000005,
+  "score": 724.7800000000002,
+  "totalangels": 1,
+  "activeangels": 1,
   "angelbonus": 2,
-  "lastupdate": 1791646100,
+  "lastupdate": 1791646803,
   "products": [
     {
       "id": 1,
       "name": "Chechia",
       "logo": "icones/Chechia.png",
-      "cout": 684.2693626392337,
+      "cout": 5.6102069228000015,
       "croissance": 1.07,
-      "revenu": 6,
-      "vitesse": 500,
-      "quantite": 77,
-      "timeleft": 499,
+      "revenu": 1,
+      "vitesse": 1000,
+      "quantite": 6,
+      "timeleft": 877,
       "managerUnlocked": true,
       "paliers": [
         {
@@ -27,7 +27,7 @@
           "idcible": 1,
           "ratio": 2,
           "typeratio": "vitesse",
-          "unlocked": true
+          "unlocked": false
         },
         {
           "name": "Chechia de ceremonie",
@@ -36,7 +36,7 @@
           "idcible": 1,
           "ratio": 2,
           "typeratio": "gain",
-          "unlocked": true
+          "unlocked": false
         },
         {
           "name": "Chechia royale",
@@ -53,12 +53,12 @@
       "id": 2,
       "name": "Chicha",
       "logo": "icones/Chicha.png",
-      "cout": 321.01500632842243,
+      "cout": 104.94037499999997,
       "croissance": 1.15,
       "revenu": 60,
       "vitesse": 2000,
-      "quantite": 12,
-      "timeleft": 0,
+      "quantite": 4,
+      "timeleft": 1400,
       "managerUnlocked": false,
       "paliers": [
         {
@@ -94,11 +94,11 @@
       "id": 3,
       "name": "Harissa",
       "logo": "icones/Harissa.png",
-      "cout": 1945.9498775039997,
+      "cout": 720,
       "croissance": 1.22,
       "revenu": 540,
       "vitesse": 4000,
-      "quantite": 5,
+      "quantite": 0,
       "timeleft": 0,
       "managerUnlocked": false,
       "paliers": [
@@ -292,7 +292,7 @@
       "idcible": 1,
       "ratio": 3,
       "typeratio": "gain",
-      "unlocked": true
+      "unlocked": false
     },
     {
       "name": "Tabac parfume",
@@ -470,6 +470,6 @@
       "unlocked": false
     }
   ],
-  "lastupdateMs": 1791646100230,
-  "saveVersion": 2
+  "saveVersion": 2,
+  "lastupdateMs": 1791646803678
 }

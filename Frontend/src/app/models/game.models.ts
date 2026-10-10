@@ -14,8 +14,3 @@ export interface SnackMessage {
   text: string;
   kind: SnackKind;
 }
-
-export interface GraphQlResponse<T> {
-  data?: T;
-  errors?: Array<{ message: string }>;
-}

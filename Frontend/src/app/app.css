@@ -15,7 +15,9 @@
   z-index: 20;
   top: 0;
   display: grid;
-  grid-template-columns: minmax(240px, 1.2fr) minmax(190px, 0.72fr) 180px minmax(230px, 0.86fr);
+  grid-template-columns:
+    minmax(240px, 1.2fr) minmax(190px, 0.72fr)
+    180px minmax(230px, 0.86fr);
   align-items: center;
   gap: 18px;
   min-height: 94px;
@@ -344,8 +346,8 @@
   grid-template-columns: minmax(0, 1.25fr) minmax(380px, 0.75fr);
   gap: clamp(32px, 6vw, 90px);
   max-width: 1480px;
-  margin: 0 auto 54px;
-  padding: clamp(30px, 4vw, 52px);
+  margin: 0 auto 24px;
+  padding: 24px;
   overflow: hidden;
   border-radius: 32px;
   background: linear-gradient(115deg, rgba(255, 250, 239, 0.96), rgba(249, 236, 214, 0.94));
@@ -370,7 +372,7 @@
   margin: 7px 0 17px;
   color: #2c1e17;
   font-family: Georgia, serif;
-  font-size: clamp(2.1rem, 4.6vw, 4.25rem);
+  font-size: clamp(1.6rem, 2.6vw, 2.5rem);
   font-weight: 730;
   letter-spacing: -0.055em;
   line-height: 0.98;

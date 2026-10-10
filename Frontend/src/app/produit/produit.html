@@ -3,7 +3,9 @@
     class="product-visual"
     type="button"
     (click)="startProduction()"
-    [disabled]="prod().managerUnlocked || prod().quantite === 0 || prod().timeleft > 0"
+    [disabled]="
+      game.busy() || prod().managerUnlocked || prod().quantite === 0 || prod().timeleft > 0
+    "
     [attr.aria-label]="'Lancer la production de ' + prod().name"
   >
     <span class="image-ring">
@@ -42,7 +44,7 @@
         class="buy-button"
         type="button"
         (click)="buy()"
-        [disabled]="!canBuy() || game.isPending('product:' + prod().id)"
+        [disabled]="game.busy() || !canBuy()"
       >
         <span class="buy-quantity">Acheter {{ numberToBuy() | bigvalue }}</span>
         <span class="buy-cost">{{ purchaseCost() | bigvalue }} DT</span>

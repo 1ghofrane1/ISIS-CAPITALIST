@@ -1,49 +1,24 @@
-# ISIS Capitalist - Frontend
+# Frontend Angular
 
-Client Angular à base de signaux pour le monde **Saveurs de Tunisie**.
+Depuis ce dossier :
 
-## Prérequis
-
-- Node.js 24+
-- Le backend NestJS lancé sur `http://localhost:3000`
-
-## Lancement
-
-Depuis `Backend/typescript-starter` :
-
-```bash
+```powershell
 npm install
-npm run start
-```
-
-Puis depuis `Frontend` :
-
-```bash
-npm install
-npm run codegen
 npm start
 ```
 
-L'application est accessible sur `http://localhost:4200`.
+Le backend doit tourner sur `http://localhost:3000`. L’interface se trouve sur `http://localhost:4200`.
 
-## Commandes utiles
+`App` affiche le monde et les fenêtres. `Produit` affiche et anime un produit. `GameService` contient les signals, les actions et les appels GraphQL avec Apollo Orbit. `economy.ts` calcule les coûts et la quantité MAX.
 
-```bash
-npm run codegen       # régénère les types et opérations GraphQL
-npm run build         # produit le bundle de production
-npm test -- --watch=false
-```
+Commandes :
 
-Le codegen lit directement le schéma du backend dans
-`../Backend/typescript-starter/src/schema.graphql`.
+- `npm run codegen` : génère les types et documents depuis le schéma backend et `queries.graphql`.
+- `npm run build` : compile l’application.
+- `npm test -- --watch=false` : exécute les tests.
 
-## Fonctionnalités
+Les durées sont en millisecondes ; seul le pipe d’affichage les convertit en secondes. Le formulaire joueur utilise `form` et `FormField`. Une mutation en cours bloque les nouveaux achats et changements de joueur.
 
-- chargement et rafraîchissement d'un monde par identifiant joueur ;
-- sauvegarde locale du pseudo ;
-- production manuelle et automatisée par les managers ;
-- achats `x1`, `x10`, `x100` et `MAX` avec coût géométrique ;
-- unlocks produit et globaux ;
-- Cash Upgrades et Angel Upgrades ;
-- investisseurs, calcul des anges et reset ;
-- badges d'actions disponibles, notifications et interface responsive.
+Les guides complets sont à la racine du projet : `GUIDE-JEU-FRONTEND-BACKEND.md` et `CORRECTIONS-JUSTIFICATIONS.md`.
+
+L’adresse du backend se configure dans `src/app/graphql/backend-url.ts` ; elle est partagée par GraphQL et les images.

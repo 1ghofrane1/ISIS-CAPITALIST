@@ -39,14 +39,13 @@
           id="player-name"
           type="text"
           autocomplete="nickname"
-          [value]="game.loginName()"
-          (input)="game.setLoginName($any($event.target).value)"
+          [formField]="game.loginForm.username"
           (keydown.enter)="game.commitName()"
         />
         <button
           type="button"
           (click)="game.commitName()"
-          [disabled]="game.loading()"
+          [disabled]="game.busy()"
           aria-label="Charger la partie de ce joueur"
         >
           {{ game.loading() ? '…' : '↗' }}
@@ -60,7 +59,6 @@
       <span></span>
     </div>
   }
-
   @if (game.world(); as world) {
     <div class="game-layout">
       <aside class="side-nav" aria-label="Menu du jeu">
@@ -139,10 +137,9 @@
         <section class="hero-panel">
           <div class="hero-copy">
             <p class="section-kicker">Tableau de bord</p>
-            <h1>Bâtissez un empire<br /><em>aux saveurs tunisiennes.</em></h1>
+            <h1>Nos ateliers tunisiens</h1>
             <p>
-              Lancez vos ateliers, investissez dans les traditions et laissez vos managers faire
-              grandir la production.
+              Produisez, achetez des produits et engagez des managers pour automatiser les ateliers.
             </p>
           </div>
 
@@ -253,6 +250,7 @@
                   (click)="game.hireManager(manager)"
                   [disabled]="
                     (game.world()?.money ?? 0) < manager.seuil ||
+                    game.busy() ||
                     game.isPending('manager:' + manager.name)
                   "
                 >
@@ -264,7 +262,6 @@
             }
           </div>
         }
-
         @case ('unlocks') {
           <div class="modal-header">
             <span class="modal-symbol unlock-icon">✦</span>
@@ -293,7 +290,6 @@
             }
           </div>
         }
-
         @case ('cash') {
           <div class="modal-header">
             <span class="modal-symbol cash-icon">◆</span>
@@ -317,6 +313,7 @@
                   (click)="game.buyCashUpgrade(upgrade)"
                   [disabled]="
                     (game.world()?.money ?? 0) < upgrade.seuil ||
+                    game.busy() ||
                     game.isPending('cash:' + upgrade.name)
                   "
                 >
@@ -328,7 +325,6 @@
             }
           </div>
         }
-
         @case ('investors') {
           <div class="modal-header">
             <span class="modal-symbol investor-icon">☀</span>
@@ -362,12 +358,16 @@
             class="claim-button"
             type="button"
             (click)="game.resetWorld()"
-            [disabled]="game.claimableAngels() === 0 || game.isPending('reset')"
+            [disabled]="game.claimableAngels() === 0 || game.busy() || game.isPending('reset')"
           >
-            {{ game.isPending('reset') ? 'Nouveau départ…' : 'Réclamer et recommencer' }}
+            {{
+              game.busy() || game.isPending('reset')
+                ? 'Nouveau départ…'
+                : 'Réclamer
+      et recommencer'
+            }}
           </button>
         }
-
         @case ('angels') {
           <div class="modal-header">
             <span class="modal-symbol angel-icon">♢</span>
@@ -395,6 +395,7 @@
                   (click)="game.buyAngelUpgrade(upgrade)"
                   [disabled]="
                     (game.world()?.activeangels ?? 0) < upgrade.seuil ||
+                    game.busy() ||
                     game.isPending('angel:' + upgrade.name)
                   "
                 >

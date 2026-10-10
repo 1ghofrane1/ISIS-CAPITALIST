@@ -1,8 +1,6 @@
-import { HttpClient } from '@angular/common/http';
-import { computed, inject, Injectable, signal } from '@angular/core';
-import type { TypedDocumentNode } from '@graphql-typed-document-node/core';
-import { print } from 'graphql';
-import { firstValueFrom } from 'rxjs';
+import { computed, inject, Injectable, linkedSignal, signal } from '@angular/core';
+import { form } from '@angular/forms/signals';
+import { Apollo } from '@apollo-orbit/angular';
 import {
   AcheterAngelUpgradeDocument,
   AcheterCashUpgradeDocument,
@@ -13,7 +11,6 @@ import {
   ResetWorldDocument,
 } from '../graphql/operations';
 import type {
-  GraphQlResponse,
   Palier,
   Product,
   PurchaseMode,
@@ -22,18 +19,50 @@ import type {
   World,
 } from '../models/game.models';
 import { maxAffordable, purchaseCost } from './economy';
+import { BACKEND_URL } from '../graphql/backend-url';
 
 @Injectable({ providedIn: 'root' })
 export class GameService {
-  private readonly http = inject(HttpClient);
+  private readonly apollo = inject(Apollo);
   private snackSequence = 0;
   private readonly pendingActions = signal<ReadonlySet<string>>(new Set());
 
-  readonly server = signal('http://localhost:3000');
+  readonly server = signal(BACKEND_URL);
   readonly user = signal('');
-  readonly loginName = signal('');
-  readonly world = signal<World | null>(null);
+  readonly loginModel = signal({ username: '' });
+  readonly loginForm = form(this.loginModel);
+  readonly worldQuery = this.apollo.signal.query({
+    query: GetWorldDocument,
+    lazy: true,
+    fetchPolicy: 'no-cache',
+    refetchOn: false,
+  });
+  // Le serveur fournit le monde ; le signal reste modifiable pour l'animation locale.
+  readonly world = linkedSignal<World | undefined, World | null>({
+    source: () => this.worldQuery.data()?.getWorld ?? undefined,
+    computation: (world, previous) =>
+      world ? this.normaliseWorld(world) : (previous?.value ?? null),
+  });
+  readonly acheterProduitsMutation = this.apollo.signal.mutation(AcheterQtProduitDocument, {
+    fetchPolicy: 'no-cache',
+  });
+  readonly productionMutation = this.apollo.signal.mutation(LancerProductionProduitDocument, {
+    fetchPolicy: 'no-cache',
+  });
+  readonly managerMutation = this.apollo.signal.mutation(EngagerManagerDocument, {
+    fetchPolicy: 'no-cache',
+  });
+  readonly cashMutation = this.apollo.signal.mutation(AcheterCashUpgradeDocument, {
+    fetchPolicy: 'no-cache',
+  });
+  readonly angelMutation = this.apollo.signal.mutation(AcheterAngelUpgradeDocument, {
+    fetchPolicy: 'no-cache',
+  });
+  readonly resetMutation = this.apollo.signal.mutation(ResetWorldDocument, {
+    fetchPolicy: 'no-cache',
+  });
   readonly loading = signal(false);
+  readonly busy = computed(() => this.loading() || this.pendingActions().size > 0);
   readonly connectionError = signal('');
   readonly snackMessage = signal<SnackMessage | null>(null);
   readonly purchaseMode = signal<PurchaseMode>(1);
@@ -66,53 +95,57 @@ export class GameService {
     }
     return Math.max(
       0,
-      Math.floor(150 * Math.sqrt(world.score / 1_000_000_000_000_000)) - world.totalangels,
+      Math.floor(150 * Math.sqrt(world.score / 1_000_000)) - world.totalangels, //au lieu de 1_000_000_000_000_000 pour demo
     );
   });
 
   constructor() {
     const storedName = localStorage.getItem('username')?.trim();
     const initialName = storedName || `Captain${Math.floor(Math.random() * 10_000)}`;
-    this.loginName.set(initialName);
+    this.setLoginName(initialName);
     this.user.set(initialName);
     localStorage.setItem('username', initialName);
     void this.refreshWorld(false);
   }
 
   setLoginName(value: string): void {
-    this.loginName.set(value);
+    this.loginModel.set({ username: value });
   }
 
   async commitName(): Promise<void> {
-    const name = this.loginName().trim();
+    if (this.busy()) return;
+    const name = this.loginModel().username.trim();
     if (!name) {
       this.notify('Saisissez un identifiant de joueur.', 'error');
       return;
     }
-    localStorage.setItem('username', name);
-    this.user.set(name);
-    await this.refreshWorld(true);
+    await this.loadWorld(name, true);
   }
 
   async refreshWorld(showConfirmation = true): Promise<void> {
-    if (this.loading()) {
-      return;
-    }
+    if (this.busy()) return;
+    await this.loadWorld(this.user(), showConfirmation);
+  }
+
+  private async loadWorld(name: string, showConfirmation: boolean): Promise<boolean> {
     this.loading.set(true);
     this.connectionError.set('');
     try {
-      const data = await this.request(GetWorldDocument, { user: this.user() });
-      if (!data.getWorld) {
-        throw new Error("Le serveur n'a retourné aucun monde.");
-      }
-      this.world.set(this.normaliseWorld(data.getWorld));
-      if (showConfirmation) {
-        this.notify(`Partie de ${this.user()} synchronisée.`, 'success');
-      }
+      const result = this.worldQuery.active()
+        ? await this.worldQuery.refetch({ user: name })
+        : await this.worldQuery.execute({ variables: { user: name } });
+      if (!result.data?.getWorld) throw new Error('Le serveur ne renvoie aucun monde.');
+      this.world.set(this.normaliseWorld(result.data.getWorld));
+      // Valider l'identité seulement quand sa partie a bien été chargée.
+      this.user.set(name);
+      localStorage.setItem('username', name);
+      if (showConfirmation) this.notify(`Partie de ${name} synchronisée.`, 'success');
+      return true;
     } catch (error) {
       const message = this.errorMessage(error);
       this.connectionError.set(message);
       this.notify(`Connexion au serveur impossible : ${message}`, 'error');
+      return false;
     } finally {
       this.loading.set(false);
     }
@@ -138,10 +171,11 @@ export class GameService {
 
   canBuy(product: Product, quantity = this.quantityToBuy(product)): boolean {
     const money = this.world()?.money ?? 0;
-    return quantity > 0 && purchaseCost(product, quantity) <= money;
+    return !this.busy() && quantity > 0 && purchaseCost(product, quantity) <= money;
   }
 
   buyProduct(productId: number): void {
+    if (this.busy()) return;
     const world = this.world();
     const product = world?.products.find((item) => item.id === productId);
     if (!world || !product) {
@@ -172,13 +206,17 @@ export class GameService {
 
     void this.sendMutation(
       `product:${productId}`,
-      AcheterQtProduitDocument,
-      { user: this.user(), id: productId, quantite: quantity },
+      () =>
+        this.acheterProduitsMutation.mutate({
+          variables: { user: this.user(), id: productId, quantite: quantity },
+        }),
       "l'achat du produit",
+      world,
     );
   }
 
   startProduction(productId: number): void {
+    if (this.busy()) return;
     const world = this.world();
     const product = world?.products.find((item) => item.id === productId);
     if (
@@ -194,20 +232,23 @@ export class GameService {
     this.world.update((current) =>
       this.updateProduct(current, productId, (item) => ({
         ...item,
-        timeleft: Math.max(0.1, item.vitesse),
+        timeleft: Math.max(1, item.vitesse),
       })),
     );
 
     void this.sendMutation(
       `production:${productId}`,
-      LancerProductionProduitDocument,
-      { user: this.user(), id: productId },
+      () =>
+        this.productionMutation.mutate({
+          variables: { user: this.user(), id: productId },
+        }),
       'du lancement de la production',
+      world,
     );
   }
 
-  tickProduct(productId: number, elapsedSeconds: number): void {
-    if (!Number.isFinite(elapsedSeconds) || elapsedSeconds <= 0) {
+  tickProduct(productId: number, elapsedMilliseconds: number): void {
+    if (this.loading() || !Number.isFinite(elapsedMilliseconds) || elapsedMilliseconds <= 0) {
       return;
     }
 
@@ -221,26 +262,27 @@ export class GameService {
       }
 
       const product = current.products[index];
-      const duration = Math.max(0.1, product.vitesse);
+      if (product.quantite <= 0) return current;
+      const duration = Math.max(1, product.vitesse);
       let remaining = product.timeleft;
       let completed = 0;
 
       if (product.managerUnlocked) {
         remaining = remaining > 0 ? remaining : duration;
-        if (elapsedSeconds >= remaining) {
-          const extraTime = elapsedSeconds - remaining;
+        if (elapsedMilliseconds >= remaining) {
+          const extraTime = elapsedMilliseconds - remaining;
           completed = 1 + Math.floor(extraTime / duration);
           const remainder = extraTime % duration;
           remaining = remainder === 0 ? duration : duration - remainder;
         } else {
-          remaining -= elapsedSeconds;
+          remaining -= elapsedMilliseconds;
         }
       } else if (remaining > 0) {
-        if (elapsedSeconds >= remaining) {
+        if (elapsedMilliseconds >= remaining) {
           completed = 1;
           remaining = 0;
         } else {
-          remaining -= elapsedSeconds;
+          remaining -= elapsedMilliseconds;
         }
       } else {
         return current;
@@ -269,6 +311,7 @@ export class GameService {
   }
 
   hireManager(manager: Palier): void {
+    if (this.busy()) return;
     const world = this.world();
     if (!world || manager.unlocked || world.money < manager.seuil) {
       this.notify("Ce manager n'est pas encore accessible.", 'error');
@@ -278,25 +321,30 @@ export class GameService {
     const nextWorld = structuredClone(world);
     const nextManager = nextWorld.managers.find((item) => item.name === manager.name);
     const product = nextWorld.products.find((item) => item.id === manager.idcible);
-    if (!nextManager || !product) {
+    if (!nextManager || !product || nextManager.unlocked || product.managerUnlocked) {
       return;
     }
     nextWorld.money -= manager.seuil;
     nextManager.unlocked = true;
     product.managerUnlocked = true;
-    product.timeleft = product.timeleft > 0 ? product.timeleft : product.vitesse;
+    product.timeleft =
+      product.quantite > 0 ? (product.timeleft > 0 ? product.timeleft : product.vitesse) : 0;
     this.world.set(nextWorld);
     this.notify(`${manager.name} automatise maintenant ${product.name}.`, 'success');
 
     void this.sendMutation(
       `manager:${manager.name}`,
-      EngagerManagerDocument,
-      { user: this.user(), name: manager.name },
+      () =>
+        this.managerMutation.mutate({
+          variables: { user: this.user(), name: manager.name },
+        }),
       "l'engagement du manager",
+      world,
     );
   }
 
   buyCashUpgrade(upgrade: Palier): void {
+    if (this.busy()) return;
     const world = this.world();
     if (!world || upgrade.unlocked || world.money < upgrade.seuil) {
       this.notify("Vous n'avez pas assez de dinars pour cet upgrade.", 'error');
@@ -305,7 +353,7 @@ export class GameService {
 
     const nextWorld = structuredClone(world);
     const nextUpgrade = nextWorld.upgrades.find((item) => item.name === upgrade.name);
-    if (!nextUpgrade) {
+    if (!nextUpgrade || nextUpgrade.unlocked) {
       return;
     }
     nextWorld.money -= upgrade.seuil;
@@ -316,13 +364,17 @@ export class GameService {
 
     void this.sendMutation(
       `cash:${upgrade.name}`,
-      AcheterCashUpgradeDocument,
-      { user: this.user(), name: upgrade.name },
+      () =>
+        this.cashMutation.mutate({
+          variables: { user: this.user(), name: upgrade.name },
+        }),
       "l'achat du Cash Upgrade",
+      world,
     );
   }
 
   buyAngelUpgrade(upgrade: Palier): void {
+    if (this.busy()) return;
     const world = this.world();
     if (!world || upgrade.unlocked || world.activeangels < upgrade.seuil) {
       this.notify("Vous n'avez pas assez d'anges actifs pour cet upgrade.", 'error');
@@ -331,7 +383,7 @@ export class GameService {
 
     const nextWorld = structuredClone(world);
     const nextUpgrade = nextWorld.angelupgrades.find((item) => item.name === upgrade.name);
-    if (!nextUpgrade) {
+    if (!nextUpgrade || nextUpgrade.unlocked) {
       return;
     }
     nextWorld.activeangels -= upgrade.seuil;
@@ -342,22 +394,26 @@ export class GameService {
 
     void this.sendMutation(
       `angel:${upgrade.name}`,
-      AcheterAngelUpgradeDocument,
-      { user: this.user(), name: upgrade.name },
+      () =>
+        this.angelMutation.mutate({
+          variables: { user: this.user(), name: upgrade.name },
+        }),
       "l'achat de l'Angel Upgrade",
+      world,
     );
   }
 
   async resetWorld(): Promise<void> {
-    if (this.claimableAngels() <= 0 || this.isPending('reset')) {
+    if (this.claimableAngels() <= 0 || this.busy()) {
       return;
     }
 
     await this.withPending('reset', async () => {
       try {
-        await this.request(ResetWorldDocument, { user: this.user() });
-        await this.refreshWorld(false);
-        this.notify('Nouveau départ : vos anges sont maintenant actifs.', 'success');
+        await this.resetMutation.mutate({ variables: { user: this.user() } });
+        if (await this.loadWorld(this.user(), false)) {
+          this.notify('Nouveau départ : vos anges sont maintenant actifs.', 'success');
+        }
       } catch (error) {
         this.notify(`Reset impossible : ${this.errorMessage(error)}`, 'error');
       }
@@ -426,7 +482,7 @@ export class GameService {
   }
 
   private applyBonus(world: World, palier: Palier): void {
-    if (palier.typeratio === 'ange' || palier.idcible === -1) {
+    if (palier.typeratio === 'ange') {
       world.angelbonus += palier.ratio;
       return;
     }
@@ -444,7 +500,7 @@ export class GameService {
         const remainingRatio = product.timeleft > 0 ? product.timeleft / previousDuration : 0;
         product.vitesse = Math.max(1, Math.floor(product.vitesse / palier.ratio));
         if (product.timeleft > 0) {
-          product.timeleft = product.vitesse * remainingRatio;
+          product.timeleft = Math.ceil(product.vitesse * remainingRatio);
         }
       }
     }
@@ -472,7 +528,7 @@ export class GameService {
       product.cout = Number(product.cout) || 0;
       product.croissance = Number(product.croissance) || 1;
       product.revenu = Number(product.revenu) || 0;
-      product.vitesse = Math.max(0.1, Number(product.vitesse) || 0.1);
+      product.vitesse = Math.max(1, Number(product.vitesse) || 1);
       const serverTimeLeft = Math.max(0, Number(product.timeleft) || 0);
       product.timeleft =
         !product.managerUnlocked && serverTimeLeft > product.vitesse ? 0 : serverTimeLeft;
@@ -480,18 +536,19 @@ export class GameService {
     return result;
   }
 
-  private async sendMutation<TData, TVariables extends object>(
+  private async sendMutation(
     key: string,
-    document: TypedDocumentNode<TData, TVariables>,
-    variables: TVariables,
+    action: () => Promise<unknown>,
     context: string,
+    previousWorld: World,
   ): Promise<void> {
     await this.withPending(key, async () => {
       try {
-        await this.request(document, variables);
+        await action();
       } catch (error) {
+        this.world.set(previousWorld);
         this.notify(`Erreur de transmission ${context} : ${this.errorMessage(error)}`, 'error');
-        await this.refreshWorld(false);
+        await this.loadWorld(this.user(), false);
       }
     });
   }
@@ -510,25 +567,6 @@ export class GameService {
         return next;
       });
     }
-  }
-
-  private async request<TData, TVariables extends object>(
-    document: TypedDocumentNode<TData, TVariables>,
-    variables: TVariables,
-  ): Promise<TData> {
-    const response = await firstValueFrom(
-      this.http.post<GraphQlResponse<TData>>(`${this.server().replace(/\/$/, '')}/graphql`, {
-        query: print(document),
-        variables,
-      }),
-    );
-    if (response.errors?.length) {
-      throw new Error(response.errors.map((error) => error.message).join(' · '));
-    }
-    if (!response.data) {
-      throw new Error('Réponse GraphQL vide.');
-    }
-    return response.data;
   }
 
   private notify(text: string, kind: SnackKind): void {
