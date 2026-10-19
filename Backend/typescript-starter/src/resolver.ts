@@ -13,6 +13,13 @@ export class GraphQlResolver {
     return world;
   }
 
+  @Query()
+  getClaimableAngels(@Args('user') user: string): number {
+    const world = this.service.updateWorld(this.service.readUserWorld(user));
+    this.service.saveWorld(user, world);
+    return this.service.getClaimableAngels(world);
+  }
+
   @Mutation()
   acheterQtProduit(
     @Args('user') user: string,

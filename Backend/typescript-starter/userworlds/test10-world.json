@@ -1,23 +1,23 @@
 {
   "name": "Saveurs de Tunisie",
   "logo": "icones/Chechia.png",
-  "money": 108843.12738295179,
-  "score": 109323,
-  "totalangels": 0,
-  "activeangels": 0,
+  "money": 213149.76,
+  "score": 42571979.760000005,
+  "totalangels": 976,
+  "activeangels": 966,
   "angelbonus": 2,
-  "lastupdate": 1791793162,
+  "lastupdate": 1792436654,
   "products": [
     {
       "id": 1,
       "name": "Chechia",
       "logo": "icones/Chechia.png",
-      "cout": 34.86108319337509,
+      "cout": 4,
       "croissance": 1.07,
-      "revenu": 1,
-      "vitesse": 500,
-      "quantite": 33,
-      "timeleft": 151,
+      "revenu": 3,
+      "vitesse": 1000,
+      "quantite": 1,
+      "timeleft": 25,
       "managerUnlocked": true,
       "paliers": [
         {
@@ -27,7 +27,7 @@
           "idcible": 1,
           "ratio": 2,
           "typeratio": "vitesse",
-          "unlocked": true
+          "unlocked": false
         },
         {
           "name": "Chechia de ceremonie",
@@ -53,11 +53,11 @@
       "id": 2,
       "name": "Chicha",
       "logo": "icones/Chicha.png",
-      "cout": 79.35,
+      "cout": 69,
       "croissance": 1.15,
-      "revenu": 60,
+      "revenu": 180,
       "vitesse": 2000,
-      "quantite": 2,
+      "quantite": 1,
       "timeleft": 0,
       "managerUnlocked": false,
       "paliers": [
@@ -96,7 +96,7 @@
       "logo": "icones/Harissa.png",
       "cout": 720,
       "croissance": 1.22,
-      "revenu": 540,
+      "revenu": 1620,
       "vitesse": 4000,
       "quantite": 0,
       "timeleft": 0,
@@ -137,7 +137,7 @@
       "logo": "icones/Fricassée.png",
       "cout": 8640,
       "croissance": 1.29,
-      "revenu": 4320,
+      "revenu": 12960,
       "vitesse": 10000,
       "quantite": 0,
       "timeleft": 0,
@@ -178,7 +178,7 @@
       "logo": "icones/Boga.png",
       "cout": 103680,
       "croissance": 1.36,
-      "revenu": 34560,
+      "revenu": 103680,
       "vitesse": 30000,
       "quantite": 0,
       "timeleft": 0,
@@ -219,7 +219,7 @@
       "logo": "icones/Djeba.png",
       "cout": 1244160,
       "croissance": 1.43,
-      "revenu": 311040,
+      "revenu": 933120,
       "vitesse": 60000,
       "quantite": 0,
       "timeleft": 0,
@@ -384,7 +384,7 @@
       "idcible": 0,
       "ratio": 3,
       "typeratio": "gain",
-      "unlocked": false
+      "unlocked": true
     },
     {
       "name": "Ange des saveurs",
@@ -471,5 +471,5 @@
     }
   ],
   "saveVersion": 2,
-  "lastupdateMs": 1791793162786
+  "lastupdateMs": 1792436654606
 }

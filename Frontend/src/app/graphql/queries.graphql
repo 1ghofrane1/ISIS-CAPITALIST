@@ -68,6 +68,10 @@ query GetWorld($user: String!) {
   }
 }
 
+query GetClaimableAngels($user: String!) {
+  getClaimableAngels(user: $user)
+}
+
 mutation AcheterQtProduit($user: String!, $id: Int!, $quantite: Int!) {
   acheterQtProduit(user: $user, id: $id, quantite: $quantite) {
     id

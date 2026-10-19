@@ -229,13 +229,50 @@ describe('GameService', () => {
     http.expectOne(endpoint).flush({ data: { acheterAngelUpgrade: { name: 'Ange' } } });
     await settle();
   });
-  it('emploie 10^15 pour le calcul des anges', () => {
-    const world = createWorld();
-    world.score = 1_000_000;
-    game.world.set(world);
+  it('affiche le nombre d’anges du serveur sans le recalculer avec le score local', async () => {
+    const pending = game.refreshClaimableAngels();
+    const request = http.expectOne(endpoint);
+    const body = JSON.parse(request.request.body);
+    expect(body.operationName).toBe('GetClaimableAngels');
+    expect(body.variables.user).toBe(game.user());
+    request.flush({ data: { getClaimableAngels: 11 } });
+    await pending;
+    expect(game.claimableAngels()).toBe(11);
+    game.world.set({ ...createWorld(), score: 1e15 });
+    expect(game.claimableAngels()).toBe(11);
+    http.expectNone(endpoint);
+    const refreshed = game.refreshClaimableAngels();
+    http.expectOne(endpoint).flush({ data: { getClaimableAngels: 12 } });
+    await refreshed;
+    expect(game.claimableAngels()).toBe(12);
+  });
+  it('ne lance pas une seconde actualisation des anges pendant la première', async () => {
+    const pending = game.refreshClaimableAngels();
+    await game.refreshClaimableAngels();
+    const request = http.expectOne(endpoint);
+    expect(game.busy()).toBe(true);
+    request.flush({ data: { getClaimableAngels: 0 } });
+    await pending;
     expect(game.claimableAngels()).toBe(0);
-    game.world.set({ ...world, score: 1_000_000_000_000_000, totalangels: 20 });
-    expect(game.claimableAngels()).toBe(130);
+    expect(game.busy()).toBe(false);
+  });
+  it('signale une erreur lors de l’actualisation des anges et débloque les actions', async () => {
+    const pending = game.refreshClaimableAngels();
+    http.expectOne(endpoint).flush({ errors: [{ message: 'Serveur indisponible' }] });
+    await pending;
+    expect(game.snackMessage()?.text).toContain('Serveur indisponible');
+    expect(game.busy()).toBe(false);
+  });
+  it('efface le compteur serveur précédent lors du changement de joueur', async () => {
+    const angels = game.refreshClaimableAngels();
+    http.expectOne(endpoint).flush({ data: { getClaimableAngels: 11 } });
+    await angels;
+    game.setLoginName('nouveau-joueur');
+    const pending = game.commitName();
+    await settle();
+    http.expectOne(endpoint).flush({ data: { getWorld: createWorld('Autre monde') } });
+    await pending;
+    expect(game.claimableAngels()).toBe(0);
   });
   it('annule l’achat local même si la resynchronisation échoue', async () => {
     game.buyProduct(1);
@@ -248,7 +285,10 @@ describe('GameService', () => {
     expect(game.connectionError()).toContain('Connexion perdue');
   });
   it('recharge le monde serveur après un reset', async () => {
-    game.world.set({ ...createWorld(), score: 1e15 });
+    game.world.set({ ...createWorld(), score: 10_000, totalangels: 4, activeangels: 2 });
+    const angels = game.refreshClaimableAngels();
+    http.expectOne(endpoint).flush({ data: { getClaimableAngels: 11 } });
+    await angels;
     const pending = game.resetWorld();
     http.expectOne(endpoint).flush({ data: { resetWorld: { name: 'Monde de test' } } });
     await settle();
@@ -256,14 +296,14 @@ describe('GameService', () => {
       data: {
         getWorld: {
           ...createWorld(),
-          score: 1e15,
-          totalangels: 150,
-          activeangels: 150,
+          score: 10_000,
+          totalangels: 15,
+          activeangels: 13,
         },
       },
     });
     await pending;
-    expect(game.world()?.activeangels).toBe(150);
+    expect(game.world()?.activeangels).toBe(13);
     expect(game.claimableAngels()).toBe(0);
   });
   it('ne rachète pas un manager depuis une ancienne référence', async () => {

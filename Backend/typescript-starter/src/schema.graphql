@@ -42,6 +42,7 @@ managers: [Palier!]!
 }
 type Query {
 getWorld(user: String!): World
+getClaimableAngels(user: String!): Int!
 }
 type Mutation {
 acheterQtProduit(user: String!, id: Int!, quantite: Int!): Product

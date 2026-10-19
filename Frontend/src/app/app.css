@@ -151,9 +151,49 @@ button:disabled {
 }
 
 .side-nav .menu-investors {
+  position: relative;
   border-left-color: #9a7fb6;
   background: #f4effb;
   color: #6d4894;
+}
+
+.angel-notification {
+  position: absolute;
+  top: -7px;
+  right: -7px;
+  display: grid;
+  place-items: center;
+  width: 22px;
+  height: 22px;
+  border: 2px solid #f7f9fb;
+  border-radius: 50%;
+  background: #b52d32;
+  color: white;
+  animation: angel-pop 350ms ease-out;
+}
+
+.angel-notification svg {
+  width: 14px;
+  height: 14px;
+  fill: currentColor;
+}
+
+@keyframes angel-pop {
+  0% {
+    transform: scale(0);
+  }
+  70% {
+    transform: scale(1.2);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .angel-notification {
+    animation: none;
+  }
 }
 
 .side-nav .menu-angels {

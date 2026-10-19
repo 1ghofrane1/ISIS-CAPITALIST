@@ -200,18 +200,39 @@ describe('Règles du jeu côté serveur', () => {
       resolver.acheterAngelUpgrade('test', 'Ange des medinas'),
     ).toThrow();
   });
-  it('calcule les anges avec 10^15 et conserve score et anges après reset', () => {
-    world.score = 1_000_000;
+  it('emploie la formule de démonstration du serveur et conserve score et anges après reset', () => {
+    world.score = 40;
     expect(service.resetWorld(world).totalangels).toBe(0);
-    world.score = 1_000_000_000_000_000;
-    world.totalangels = 20;
-    world.activeangels = 5;
+    world.score = 10_000;
+    world.totalangels = 4;
+    world.activeangels = 2;
+    expect(service.getClaimableAngels(world)).toBe(11);
     const reset = service.resetWorld(world);
-    expect(reset.totalangels).toBe(150);
-    expect(reset.activeangels).toBe(135);
+    expect(reset.totalangels).toBe(15);
+    expect(reset.activeangels).toBe(13);
     expect(reset.score).toBe(world.score);
     expect(reset.money).toBe(100);
     expect(reset.products[0].timeleft).toBe(0);
+    expect(service.getClaimableAngels(reset)).toBe(0);
+  });
+  it('actualise les productions avant de renvoyer les anges récupérables', () => {
+    Object.assign(world.products[0], {
+      revenu: 60,
+      vitesse: 2000,
+      timeleft: 500,
+      managerUnlocked: true,
+    });
+    vi.mocked(Date.now).mockReturnValue(now + 7000);
+    expect(resolver.getClaimableAngels('test')).toBe(2);
+    expect(world.score).toBe(240);
+    expect(world.totalangels).toBe(0);
+    expect(world.activeangels).toBe(0);
+    expect(service.saveWorld).toHaveBeenCalledWith('test', world);
+  });
+  it('ne renvoie pas un nombre négatif d’anges à récupérer', () => {
+    world.score = 10_000;
+    world.totalangels = 20;
+    expect(service.getClaimableAngels(world)).toBe(0);
   });
 });
 

@@ -59,6 +59,18 @@
           </button>
           <button type="button" class="menu-investors" (click)="openModal('investors')">
             Anges et reset
+            @if (game.claimableAngels() > 0) {
+              <span
+                class="angel-notification"
+                role="img"
+                aria-label="Des anges sont prêts à être récupérés"
+                title="Des anges sont prêts à être récupérés"
+              >
+                <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                  <path d="m12 3 2.7 6.3L21 12l-6.3 2.7L12 21l-2.7-6.3L3 12l6.3-2.7Z" />
+                </svg>
+              </span>
+            }
           </button>
           <button
             type="button"
@@ -270,9 +282,11 @@
             [disabled]="game.claimableAngels() === 0 || game.busy() || game.isPending('reset')"
           >
             {{
-              game.busy() || game.isPending('reset')
-                ? 'Réinitialisation…'
-                : 'Récupérer les anges et recommencer'
+              game.isPending('claimable-angels')
+                ? 'Actualisation des anges…'
+                : game.busy() || game.isPending('reset')
+                  ? 'Réinitialisation…'
+                  : 'Récupérer les anges et recommencer'
             }}
           </button>
         }

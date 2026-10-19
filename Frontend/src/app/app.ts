@@ -6,6 +6,7 @@ import {
   HostListener,
   inject,
   signal,
+  untracked,
 } from '@angular/core';
 import { MatBadge } from '@angular/material/badge';
 import { FormField } from '@angular/forms/signals';
@@ -64,6 +65,19 @@ export class App {
       verticalPosition: 'bottom',
       panelClass: [`snack-${message.kind}`],
     });
+  });
+
+  // Les productions changent souvent le monde, mais pas l’identité de la partie.
+  private readonly angelsPlayer = computed(() => (this.game.world() ? this.game.user() : null));
+
+  // Vérifier le menu toutes les 5 s, et le compteur ouvert toutes les secondes.
+  private readonly investorsEffect = effect((onCleanup) => {
+    if (this.angelsPlayer() === null) return;
+    const delay = this.activeModal() === 'investors' ? 1000 : 5000;
+    const refresh = () => void this.game.refreshClaimableAngels();
+    untracked(refresh);
+    const timer = setInterval(refresh, delay);
+    onCleanup(() => clearInterval(timer));
   });
 
   openModal(modal: ModalName): void {

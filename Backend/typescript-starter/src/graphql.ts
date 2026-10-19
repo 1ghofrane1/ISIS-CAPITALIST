@@ -56,6 +56,8 @@ export class World {
 
 export abstract class IQuery {
     abstract getWorld(user: string): Nullable<World> | Promise<Nullable<World>>;
+
+    abstract getClaimableAngels(user: string): number | Promise<number>;
 }
 
 export abstract class IMutation {

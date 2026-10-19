@@ -67,12 +67,15 @@ export class AppService {
     return world;
   }
 
-  resetWorld(world: World): SavedWorld {
-    const earnedAngels = Math.max(
+  getClaimableAngels(world: World): number {
+    return Math.max(
       0,
-      Math.floor(150 * Math.sqrt(world.score / 1_000_000)) -
-        world.totalangels,
+      Math.floor(150 * Math.sqrt(world.score / 1_000_000)) - world.totalangels,
     );
+  }
+
+  resetWorld(world: World): SavedWorld {
+    const earnedAngels = this.getClaimableAngels(world);
     const result = this.newWorld();
     result.score = world.score;
     result.totalangels = world.totalangels + earnedAngels;

@@ -6,6 +6,7 @@ import {
   AcheterCashUpgradeDocument,
   AcheterQtProduitDocument,
   EngagerManagerDocument,
+  GetClaimableAngelsDocument,
   GetWorldDocument,
   LancerProductionProduitDocument,
   ResetWorldDocument,
@@ -33,6 +34,12 @@ export class GameService {
   readonly loginForm = form(this.loginModel);
   readonly worldQuery = this.apollo.signal.query({
     query: GetWorldDocument,
+    lazy: true,
+    fetchPolicy: 'no-cache',
+    refetchOn: false,
+  });
+  private readonly claimableAngelsQuery = this.apollo.signal.query({
+    query: GetClaimableAngelsDocument,
     lazy: true,
     fetchPolicy: 'no-cache',
     refetchOn: false,
@@ -88,16 +95,7 @@ export class GameService {
       ).length ?? 0,
   );
 
-  readonly claimableAngels = computed(() => {
-    const world = this.world();
-    if (!world) {
-      return 0;
-    }
-    return Math.max(
-      0,
-      Math.floor(150 * Math.sqrt(world.score / 1_000_000)) - world.totalangels, //au lieu de 1_000_000_000_000_000 pour demo
-    );
-  });
+  readonly claimableAngels = signal(0);
 
   constructor() {
     const storedName = localStorage.getItem('username')?.trim();
@@ -137,6 +135,7 @@ export class GameService {
       if (!result.data?.getWorld) throw new Error('Le serveur ne renvoie aucun monde.');
       this.world.set(this.normaliseWorld(result.data.getWorld));
       // Valider l'identité seulement quand sa partie a bien été chargée.
+      if (this.user() !== name) this.claimableAngels.set(0);
       this.user.set(name);
       localStorage.setItem('username', name);
       if (showConfirmation) this.notify(`Partie de ${name} synchronisée.`, 'success');
@@ -149,6 +148,24 @@ export class GameService {
     } finally {
       this.loading.set(false);
     }
+  }
+
+  async refreshClaimableAngels(): Promise<void> {
+    if (!this.world() || this.busy()) return;
+    const user = this.user();
+    await this.withPending('claimable-angels', async () => {
+      try {
+        const result = this.claimableAngelsQuery.active()
+          ? await this.claimableAngelsQuery.refetch({ user })
+          : await this.claimableAngelsQuery.execute({ variables: { user } });
+        if (result.data?.getClaimableAngels == null) {
+          throw new Error('Le serveur ne renvoie aucun nombre d’anges.');
+        }
+        this.claimableAngels.set(result.data.getClaimableAngels);
+      } catch (error) {
+        this.notify(`Actualisation des anges impossible : ${this.errorMessage(error)}`, 'error');
+      }
+    });
   }
 
   cyclePurchaseMode(): void {
@@ -411,6 +428,7 @@ export class GameService {
     await this.withPending('reset', async () => {
       try {
         await this.resetMutation.mutate({ variables: { user: this.user() } });
+        this.claimableAngels.set(0);
         if (await this.loadWorld(this.user(), false)) {
           this.notify('Nouveau départ : vos anges sont maintenant actifs.', 'success');
         }
